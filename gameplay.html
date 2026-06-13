@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gameplay — Mobile Eggbert</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topnav">
+  <a class="brand" href="index.html">🐣 Mobile Eggbert</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="history.html">History</a>
+    <a href="build.html">Build</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="gameplay.html" class="active">Gameplay</a>
+    <a href="api-enums.html">API Reference</a>
+    <a href="assets.html">Assets</a>
+    <a href="formats.html">Formats</a>
+    <a href="cheats.html">Cheats</a>
+    <a href="performance.html">Performance</a>
+  </nav>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h4>On This Page</h4>
+    <a href="#overview">Game Overview</a>
+    <a href="#phases">Phase System</a>
+    <a href="#player">Player States</a>
+    <a href="#vehicles">Vehicles</a>
+    <a href="#powerups">Power-Ups</a>
+    <a href="#enemies">Enemies</a>
+    <a href="#collectibles">Collectibles</a>
+    <a href="#keys">Keys &amp; Doors</a>
+    <a href="#input">Input</a>
+    <a href="#speed">Game Speed</a>
+    <a href="#camera">Camera</a>
+  </aside>
+
+  <div style="flex:1; min-width:0;">
+    <main>
+      <h1>Gameplay Mechanics</h1>
+
+      <h2 id="overview">Game Overview</h2>
+      <p>Mobile Eggbert is a 2D side-scrolling platform game. The player controls <strong>Blupi</strong> through 78 levels organized into a tutorial plus 9 chapters. Each level is a 100×100-tile grid. The objective is to collect treasures and reach the goal exit.</p>
+
+      <div class="grid-2">
+        <div>
+          <h3>Win Conditions</h3>
+          <ul>
+            <li>Collect all treasures in the level</li>
+            <li>Reach the goal exit marker</li>
+          </ul>
+        </div>
+        <div>
+          <h3>Lose Conditions</h3>
+          <ul>
+            <li>Fall into lava</li>
+            <li>Drowning (deep water with no swim power)</li>
+            <li>Bomb explosion</li>
+            <li>Run out of lives</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 id="phases">Game Phase System</h2>
+      <p><code>Def::Phase</code> drives the top-level game mode. All phase transitions go through <code>Game1::SetPhase()</code>, which handles asset loading, InputPad reconfiguration, and fade animations.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Phase</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>None</code></td><td>Initial / uninitialized state</td></tr>
+            <tr><td><code>First</code></td><td>First frame after startup — triggers load sequence</td></tr>
+            <tr><td><code>Wait</code></td><td>Loading progress screen with an artificial delay and a gauge bar</td></tr>
+            <tr><td><code>Init</code></td><td>Main menu / gamer slot selection screen</td></tr>
+            <tr><td><code>Play</code></td><td>Active gameplay — Decor is updated and rendered each frame</td></tr>
+            <tr><td><code>Pause</code></td><td>Pause overlay — game logic frozen</td></tr>
+            <tr><td><code>Lost</code></td><td>Level failure screen</td></tr>
+            <tr><td><code>Win</code></td><td>Level completion screen</td></tr>
+            <tr><td><code>Trial</code></td><td>Demo/trial paywall screen</td></tr>
+            <tr><td><code>MainSetup</code></td><td>Settings opened from the main menu</td></tr>
+            <tr><td><code>PlaySetup</code></td><td>Settings opened during gameplay (from pause)</td></tr>
+            <tr><td><code>Resume</code></td><td>Checkpoint continuation prompt</td></tr>
+            <tr><td><code>Ranking</code></td><td>High-score / ranking screen</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>All 12 phases are handled in <code>Game1::Update()</code> and <code>Game1::Draw()</code>. Transitions use fade-out/fade-in animations managed by <code>Game1</code>.</p>
+
+      <h2 id="player">Player Animation States</h2>
+      <p>Blupi has <strong>88 named animation states</strong> defined in <code>BlupiAction</code>. The active state drives sprite selection via the 2911-entry <code>Tables</code> animation table.</p>
+
+      <h3>Basic Movement</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>State</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>Stop</code></td><td>Standing still</td></tr>
+            <tr><td><code>March</code></td><td>Walking</td></tr>
+            <tr><td><code>Turn</code></td><td>Turning around</td></tr>
+            <tr><td><code>StopMarch</code></td><td>Stopping from a walk</td></tr>
+            <tr><td><code>Jump</code></td><td>Beginning of jump</td></tr>
+            <tr><td><code>Air</code></td><td>In the air (mid-jump)</td></tr>
+            <tr><td><code>StopJump</code></td><td>Landing from jump</td></tr>
+            <tr><td><code>Vertigo</code></td><td>Edge vertigo ("whoops" at ledge)</td></tr>
+            <tr><td><code>Teleporte</code></td><td>Teleporting animation</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Special Animations</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>State</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>Win</code></td><td>Victory animation</td></tr>
+            <tr><td><code>Mockery</code></td><td>Mockery/taunt animation</td></tr>
+            <tr><td><code>Glu</code></td><td>Glued / trapped</td></tr>
+            <tr><td><code>Electro</code></td><td>Electrocuted</td></tr>
+            <tr><td><code>Balloon</code></td><td>Stung by wasp (swelling)</td></tr>
+            <tr><td><code>Hide</code></td><td>Invisible (cloud power active)</td></tr>
+            <tr><td><code>StopEcrase / MarchEcrase</code></td><td>Flattened state (standing / moving)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="vehicles">Vehicles</h2>
+      <p>Five vehicles can be entered by walking over them. Each has its own set of <code>BlupiAction</code> states and unique physics rules.</p>
+
+      <div class="cards">
+        <div class="card" style="cursor:default;">
+          <div class="card-icon">🚁</div>
+          <div class="card-title">Helicopter</div>
+          <div class="card-desc">Fly freely. States: StopHelico, MarchHelico, TurnHelico, HelicoGlu. ObjectType: Helico (13), BlupiHelico (32).</div>
+        </div>
+        <div class="card" style="cursor:default;">
+          <div class="card-icon">🚗</div>
+          <div class="card-title">Jeep</div>
+          <div class="card-desc">Fast ground vehicle. States: StopJeep, MarchJeep, TurnJeep. ObjectType: Jeep (19).</div>
+        </div>
+        <div class="card" style="cursor:default;">
+          <div class="card-icon">🎯</div>
+          <div class="card-title">Tank</div>
+          <div class="card-desc">Fires bullets. States: StopTank, MarchTank, TurnTank, FireTank. Has ammo counter (m_blupiBullet). ObjectType: Tank (28), BlupiTank (33).</div>
+        </div>
+        <div class="card" style="cursor:default;">
+          <div class="card-icon">🛸</div>
+          <div class="card-title">Hovercraft</div>
+          <div class="card-desc">Hovers over ground and water. States: StopOver, MarchOver, TurnOver. ObjectType: Over (46).</div>
+        </div>
+        <div class="card" style="cursor:default;">
+          <div class="card-icon">🛹</div>
+          <div class="card-title">Skateboard</div>
+          <div class="card-desc">Fast ground movement, can jump. States: StopSkate, MarchSkate, JumpSkate, TakeSkate, DeposeSkate. ObjectType: Skate (24).</div>
+        </div>
+      </div>
+
+      <h2 id="powerups">Power-Ups</h2>
+      <p>Active power states are tracked in the <code>SecretPower</code> enum and corresponding <code>Decor</code> fields:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Power-Up</th><th>SecretPower</th><th>Effect</th><th>Duration</th></tr></thead>
+          <tbody>
+            <tr><td>Shield</td><td><code>Shield</code></td><td>Damage protection</td><td>100-tick timer (<code>m_blupiShield</code>)</td></tr>
+            <tr><td>Lollipop</td><td><code>Power</code></td><td>Strength boost (push heavier objects, etc.)</td><td>Timer-based</td></tr>
+            <tr><td>Cloud</td><td><code>Cloud</code></td><td>Invisibility to enemies</td><td>Timer (<code>m_blupiCloud</code>)</td></tr>
+            <tr><td>Hidden</td><td><code>Hide</code></td><td>Hidden / invisible rendering state</td><td>Timer (<code>m_blupiPhantom</code>)</td></tr>
+            <tr><td>Drink</td><td>—</td><td>Special drinkable item effect</td><td>One-shot</td></tr>
+            <tr><td>Charge</td><td>—</td><td>Charging station interaction</td><td>One-shot</td></tr>
+            <tr><td>Dynamite</td><td>—</td><td>Explosive item (counter: <code>m_blupiDynamite</code>)</td><td>Count-based</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="enemies">Enemies &amp; Hazards</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ObjectType</th><th>ID</th><th>Behaviour</th></tr></thead>
+          <tbody>
+            <tr><td><code>BombeDown</code></td><td>2</td><td>Stationary floor bomb</td></tr>
+            <tr><td><code>BombeUp</code></td><td>3</td><td>Hanging ceiling bomb</td></tr>
+            <tr><td><code>BombeMove</code></td><td>16</td><td>Moving bomb along a path</td></tr>
+            <tr><td><code>BombeFollow1/2</code></td><td>96–97</td><td>Homing bomb that tracks the player</td></tr>
+            <tr><td><code>Bulldozer</code></td><td>4</td><td>Ground enemy, pushes Blupi</td></tr>
+            <tr><td><code>Oiseau</code></td><td>20</td><td>Bird, aerial patrol enemy</td></tr>
+            <tr><td><code>Guepe</code></td><td>44</td><td>Wasp — stings Blupi, causing Balloon swelling</td></tr>
+            <tr><td><code>Poisson</code></td><td>17</td><td>Fish, aquatic enemy</td></tr>
+            <tr><td><code>Tentacule</code></td><td>53</td><td>Slime tentacle rising effect</td></tr>
+            <tr><td><code>Creature</code></td><td>54</td><td>Moving slime creature</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Environmental Hazards (tile-based)</h3>
+      <ul>
+        <li><strong>Lava</strong> — instant kill tiles; detected by <code>Decor::IsLave()</code></li>
+        <li><strong>Deep water</strong> — drowning if Blupi cannot swim; <code>Decor::IsDeepWater()</code></li>
+        <li><strong>Electric zones</strong> — <code>Electro</code> object type + <code>ElectricShake</code> camera action</li>
+        <li><strong>Pollution / toxic zones</strong> — <code>Pollution</code> object type</li>
+      </ul>
+
+      <h2 id="collectibles">Collectibles</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>ObjectType</th><th>ID</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>Tresor</code></td><td>5</td><td>Treasure — collect all to unlock the goal exit</td></tr>
+            <tr><td><code>Egg</code></td><td>6</td><td>Egg — grants an extra life</td></tr>
+            <tr><td><code>Goal</code></td><td>7</td><td>Level exit marker — active only after all treasures collected</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="keys">Keys &amp; Doors</h2>
+      <p>Three coloured keys unlock corresponding coloured doors. Key state is tracked as a 3-bit bitmask in <code>DoorKeyFlags</code>.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Key ObjectType</th><th>ID</th><th>Colour</th><th>DoorKeyFlags bit</th></tr></thead>
+          <tbody>
+            <tr><td><code>Cle</code></td><td>21</td><td>Gold</td><td>General key (all doors?)</td></tr>
+            <tr><td><code>Cle1</code></td><td>49</td><td>Red</td><td><code>Key1</code> (bit 0)</td></tr>
+            <tr><td><code>Cle2</code></td><td>50</td><td>Green</td><td><code>Key2</code> (bit 1)</td></tr>
+            <tr><td><code>Cle3</code></td><td>51</td><td>Blue</td><td><code>Key3</code> (bit 2)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="input">Player Input</h2>
+      <p>Input is handled by <code>InputPad</code>. On non-touch platforms, keyboard bindings replace the touch buttons. Input is represented as two values:</p>
+      <ul>
+        <li><strong>Direction</strong> — <code>Direction::None</code>, <code>Left</code>, or <code>Right</code></li>
+        <li><strong>KeyPressFlags</strong> — bitmask: <code>Jump</code> (bit 0), <code>Fire</code> (bit 1), <code>Down</code> (bit 2)</li>
+      </ul>
+
+      <h2 id="speed">Game Speed</h2>
+      <p>The settings menu allows selecting a game speed multiplier via the <code>GameSpeed</code> enum:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Setting</th><th>Multiplier</th></tr></thead>
+          <tbody>
+            <tr><td><code>Slow</code></td><td>0.5×</td></tr>
+            <tr><td><code>Normal</code></td><td>1.0× (default)</td></tr>
+            <tr><td><code>Fast</code></td><td>2.0×</td></tr>
+            <tr><td><code>Faster</code></td><td>3.0×</td></tr>
+            <tr><td><code>Fastest</code></td><td>4.0×</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="camera">Camera &amp; Shake</h2>
+      <p>The camera follows Blupi with smooth scrolling. In-game events trigger camera shake via the <code>DecorAction</code> enum:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>DecorAction</th><th>Value</th><th>Trigger</th></tr></thead>
+          <tbody>
+            <tr><td><code>None</code></td><td>0</td><td>No shake</td></tr>
+            <tr><td><code>SmallShake</code></td><td>1</td><td>Minor impact (crate landing, bonus collection)</td></tr>
+            <tr><td><code>BigShake</code></td><td>2</td><td>Major impact (fan blade hit, large explosion)</td></tr>
+            <tr><td><code>ElectricShake</code></td><td>5</td><td>Electric contact</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+    <footer>
+      Mobile Eggbert is based on <em>Speedy Blupi</em> by Epsitec SA &amp; Daniel Roux.
+      C++ port by the OpenEggbert project. MIT License.
+    </footer>
+  </div>
+</div>
+
+</body>
+</html>

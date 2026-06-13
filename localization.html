@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Localization — Mobile Eggbert</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topnav">
+  <a class="brand" href="index.html">🐣 Mobile Eggbert</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="history.html">History</a>
+    <a href="build.html">Build</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="api-enums.html">API Reference</a>
+    <a href="assets.html">Assets</a>
+    <a href="formats.html">Formats</a>
+    <a href="cheats.html">Cheats</a>
+    <a href="performance.html">Performance</a>
+  </nav>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h4>On This Page</h4>
+    <a href="#overview">Overview</a>
+    <a href="#languages">Languages</a>
+    <a href="#strings">String Categories</a>
+    <a href="#adding">Adding a Language</a>
+  </aside>
+
+  <div style="flex:1; min-width:0;">
+    <main>
+      <h1>Localization</h1>
+
+      <h2 id="overview">Overview</h2>
+      <p>UI strings are localized using a simple switch-based system in <code>MyResource.cpp</code> / <code>MyResource.hpp</code>. The active language is selected at runtime based on the device locale or a settings value.</p>
+
+      <h2 id="languages">Supported Languages</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Language</th><th>Code</th><th>Notes</th></tr></thead>
+        <tbody>
+          <tr><td>French</td><td>FR</td><td>The game's original language. Used as the fallback when no other match is found.</td></tr>
+          <tr><td>English</td><td>EN</td><td>Full translation of all UI strings.</td></tr>
+          <tr><td>German</td><td>DE</td><td>Full translation of all UI strings.</td></tr>
+        </tbody>
+      </table></div>
+
+      <h2 id="strings">String Categories</h2>
+      <p>The following types of strings are covered by <code>MyResource</code>:</p>
+      <ul>
+        <li><strong>Level names</strong> — displayed on the level complete screen and ranking</li>
+        <li><strong>Button labels</strong> — text on UI buttons (Play, Settings, Buy, etc.)</li>
+        <li><strong>Menu text</strong> — headers and descriptions in settings / pause menus</li>
+        <li><strong>Status messages</strong> — HUD text, pause overlay text</li>
+        <li><strong>Cheat code names</strong> — display names for the 22 cheats (separate from <code>Tables::CheatCodes</code>)</li>
+      </ul>
+
+      <h2 id="adding">Adding a Language</h2>
+      <p>To add a new language:</p>
+      <ol>
+        <li>Add a new branch to the switch statement in <code>MyResource.cpp</code> for each string key</li>
+        <li>Add the language code to the detection logic at the top of <code>MyResource.cpp</code></li>
+        <li>Test every screen (Init, Pause, Settings, Win, Lost, Ranking, Resume, Trial)</li>
+      </ol>
+
+      <div class="callout info">
+        <strong>No Translation File Format</strong>
+        Strings are hardcoded directly in C++ switch statements in <code>MyResource.cpp</code>, not loaded
+        from external files. There is no .po / .json / .resx localization file format to manage.
+      </div>
+
+    </main>
+    <footer>
+      Mobile Eggbert is based on <em>Speedy Blupi</em> by Epsitec SA &amp; Daniel Roux.
+      C++ port by the OpenEggbert project. MIT License.
+    </footer>
+  </div>
+</div>
+
+</body>
+</html>

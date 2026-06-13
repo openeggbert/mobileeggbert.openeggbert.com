@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Known Issues — Mobile Eggbert</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topnav">
+  <a class="brand" href="index.html">🐣 Mobile Eggbert</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="history.html">History</a>
+    <a href="build.html">Build</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="api-enums.html">API Reference</a>
+    <a href="assets.html">Assets</a>
+    <a href="formats.html">Formats</a>
+    <a href="cheats.html">Cheats</a>
+    <a href="performance.html">Performance</a>
+  </nav>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h4>On This Page</h4>
+    <a href="#bugs">Open Bugs</a>
+    <a href="#enums">Magic Numbers</a>
+    <a href="#doxygen">Doxygen Docs</a>
+    <a href="#perf">Performance</a>
+  </aside>
+
+  <div style="flex:1; min-width:0;">
+    <main>
+      <h1>Known Issues &amp; TODO</h1>
+      <p>This page aggregates outstanding issues from <code>TODO.md</code>, <code>ENUMS.md</code>, and <code>DOXYGEN_DOCUMENTATION_PLAN.md</code>.</p>
+
+      <h2 id="bugs">Open Bugs (from TODO.md)</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>#</th><th>Issue</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Accelerometer visibility</td>
+            <td>The accelerometer setting button should only appear on hardware that actually has an accelerometer. Currently visible on all platforms.</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Sound system verification</td>
+            <td>Audio playback needs end-to-end testing across all platforms (Linux, Windows, Web, Android). Particularly the 93 WAV files and volume/balance panning.</td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Sprite transparency</td>
+            <td>Some sprites have transparency handling issues — certain pixels appear with incorrect blending artefacts.</td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Fullscreen mode</td>
+            <td>Fullscreen mode currently malfunctions (incorrect resolution or display state). Windowed mode is unaffected.</td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>Web sound delay</td>
+            <td>Audio has a noticeable startup delay in the Emscripten/WebAssembly build on first sound playback. Likely related to browser autoplay policy and SDL3_mixer initialization.</td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Cheat name conflict</td>
+            <td><code>quick</code> and <code>quicklollypop</code> cheat codes conflict because one is a prefix of the other. The fix is to rename <code>quicklollypop</code>.</td>
+          </tr>
+        </tbody>
+      </table></div>
+
+      <h2 id="enums">Magic Number Refactoring (from ENUMS.md)</h2>
+      <p>Multiple locations in the codebase still use raw integer literal magic numbers instead of the typed enums defined in <code>include/def/</code> and <code>include/decor/</code>.</p>
+      <p>The <code>ENUMS.md</code> file catalogues every location where this occurs. Fixing them is an ongoing refactoring effort. The priority is:</p>
+      <ol>
+        <li><code>Decor.cpp</code> — the largest file with the most magic numbers</li>
+        <li><code>Game1.cpp</code> — button and phase comparisons</li>
+        <li>Smaller files</li>
+      </ol>
+      <div class="callout warn">
+        <strong>Impact</strong>
+        Magic number usages do not cause bugs on their own, but they make the code harder to maintain and
+        refactor. Replacing them with enum values enables type checking by the compiler.
+      </div>
+
+      <h2 id="doxygen">Doxygen Documentation (from DOXYGEN_DOCUMENTATION_PLAN.md)</h2>
+      <p>Complete Doxygen documentation is planned for all 50 source files. As of the last update, it has not yet been written.</p>
+
+      <h3>Priority Groups</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Priority</th><th>Files</th><th>Reason</th></tr></thead>
+        <tbody>
+          <tr><td>1–4 (highest)</td><td>Decor.cpp/hpp, Tables.cpp/hpp, Game1.cpp/hpp</td><td>Complex algorithms, animation table layout, phase state machine</td></tr>
+          <tr><td>5–12</td><td>Pixmap, Worlds, GameData, InputPad, Sound, decor/* headers</td><td>Public API surfaces used by multiple callers</td></tr>
+          <tr><td>13–21</td><td>MyResource, Misc, Text, Slider, Helper, TinyRect, TinyPoint, IPixmap, ISound, IGame1, ConfigDef, Config</td><td>Utility classes and interfaces</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Documentation Conventions</h3>
+      <p>All files must follow the conventions in <code>DOXYGEN_DOCUMENTATION_PLAN.md</code> and <code>CLAUDE.md</code>:</p>
+      <ul>
+        <li>Every file: <code>@file</code> + <code>@brief</code> + <code>@details</code></li>
+        <li>Every class: <code>@class</code>, <code>@brief</code>, <code>@details</code>, <code>@note</code>, <code>@warning</code>, <code>@see</code></li>
+        <li>Every method: <code>@brief</code>, <code>@param[in/out]</code> (directional), <code>@return</code>/<code>@retval</code>, <code>@throws</code>, <code>@pre</code>, <code>@post</code></li>
+        <li>Member variables: trailing <code>///&lt; @brief</code> inline comment</li>
+        <li><code>.cpp</code> files: document only what is <em>not</em> already in the <code>.hpp</code></li>
+      </ul>
+
+      <h2 id="perf">Performance Issues</h2>
+      <p>Four known performance issues in <code>Decor.cpp</code>. None are blocking. See <a href="performance.html">Performance</a> for the full analysis and proposed fixes.</p>
+      <ul>
+        <li><a href="performance.html#issue1">Issue 1</a>: <code>ByeByeDraw</code> — unnecessary struct copy in draw loop</li>
+        <li><a href="performance.html#issue2">Issue 2</a>: <code>ByeByeAdd</code> — double-copy on vector insert</li>
+        <li><a href="performance.html#issue3">Issue 3</a>: <code>ByeByeStep</code> — O(n) erase during iteration</li>
+        <li><a href="performance.html#issue4">Issue 4</a>: <code>MoveObjectSort</code> — O(n²) bubble sort with struct copies</li>
+      </ul>
+
+    </main>
+    <footer>
+      Mobile Eggbert is based on <em>Speedy Blupi</em> by Epsitec SA &amp; Daniel Roux.
+      C++ port by the OpenEggbert project. MIT License.
+    </footer>
+  </div>
+</div>
+
+</body>
+</html>

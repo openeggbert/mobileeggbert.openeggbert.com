@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Project History — Mobile Eggbert</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topnav">
+  <a class="brand" href="index.html">🐣 Mobile Eggbert</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="history.html" class="active">History</a>
+    <a href="build.html">Build</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="api-enums.html">API Reference</a>
+    <a href="assets.html">Assets</a>
+    <a href="formats.html">Formats</a>
+    <a href="cheats.html">Cheats</a>
+    <a href="performance.html">Performance</a>
+  </nav>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h4>On This Page</h4>
+    <a href="#evolution">Code Evolution</a>
+    <a href="#related">Related Projects</a>
+    <a href="#family">The Blupi Family</a>
+    <a href="#license">License</a>
+  </aside>
+
+  <div style="flex:1; min-width:0;">
+    <main>
+      <h1>Project History</h1>
+      <p>Mobile Eggbert has a long and winding heritage tracing back to a Windows Phone XNA game from 2013. Understanding this history helps explain many of the naming and structural decisions in the codebase.</p>
+
+      <h2 id="evolution">Code Evolution Timeline</h2>
+
+      <div style="position:relative; padding-left:24px; border-left: 2px solid var(--border);">
+
+        <div style="margin-bottom:32px;">
+          <div style="position:absolute; left:-9px; width:16px; height:16px; border-radius:50%; background:var(--accent); border:2px solid var(--bg);"></div>
+          <div style="padding-left:16px;">
+            <strong style="color:var(--accent)">2013 — Speedy Blupi (Windows Phone)</strong>
+            <p>The original game was written in <strong>C# XNA 4.0</strong> for Windows Phone 8 by Epsitec SA (Daniel Roux). It is a side-scrolling platform game featuring the Blupi character. The source code was never publicly released.</p>
+          </div>
+        </div>
+
+        <div style="margin-bottom:32px;">
+          <div style="position:absolute; left:-9px; width:16px; height:16px; border-radius:50%; background:var(--bg3); border:2px solid var(--accent);"></div>
+          <div style="padding-left:16px;">
+            <strong style="color:var(--text)">Step 1 — ILSpy Decompilation</strong>
+            <p>The Windows Phone binary was decompiled using <a href="https://github.com/icsharpcode/ILSpy" target="_blank">ILSpy</a>. Symbol names (classes, methods, fields) were largely preserved by the decompiler, which later assisted reverse-engineering of related games such as <em>Speedy Eggbert 2</em> and <em>Free Eggbert</em>.</p>
+            <p>The decompiled source lives in <code>mobile-eggbert-legacy/</code>.</p>
+          </div>
+        </div>
+
+        <div style="margin-bottom:32px;">
+          <div style="position:absolute; left:-9px; width:16px; height:16px; border-radius:50%; background:var(--bg3); border:2px solid var(--accent);"></div>
+          <div style="padding-left:16px;">
+            <strong style="color:var(--text)">Step 2 — MonoGame Migration</strong>
+            <p>The decompiled C# source was adapted to compile and run on <a href="https://monogame.net/" target="_blank">MonoGame</a> (a cross-platform XNA implementation). This allowed running the game on Linux and Windows with minimal code changes.</p>
+          </div>
+        </div>
+
+        <div style="margin-bottom:32px;">
+          <div style="position:absolute; left:-9px; width:16px; height:16px; border-radius:50%; background:var(--bg3); border:2px solid var(--accent);"></div>
+          <div style="padding-left:16px;">
+            <strong style="color:var(--text)">Step 3 — C++ Rewrite</strong>
+            <p>A complete line-by-line rewrite from C# to C++ was performed. The rewrite preserved all original class names, method signatures, and enum values as closely as possible. Starting from <code>mobile-eggbert-core</code> commit <code>1cbc134</code>.</p>
+            <p>The C++ version uses <strong>SharpRuntime</strong> to emulate .NET base-class types (<code>String</code>, <code>List&lt;T&gt;</code>, <code>Dictionary&lt;K,V&gt;</code>, <code>Math</code>, etc.) that the original code relied upon.</p>
+          </div>
+        </div>
+
+        <div style="margin-bottom:32px;">
+          <div style="position:absolute; left:-9px; width:16px; height:16px; border-radius:50%; background:var(--success); border:2px solid var(--bg);"></div>
+          <div style="padding-left:16px;">
+            <strong style="color:var(--success)">Current — CNA Migration (this repo)</strong>
+            <p>The graphics and audio backend was replaced from MonoGame with <strong>CNA</strong> — a custom C++ XNA 4.0-compatible API layer built on <strong>SDL3</strong>. This enables native compilation without Mono and provides full control over rendering.</p>
+            <p>This repository (<code>mobile-eggbert</code>) is the current active version.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <h2 id="related">Related Projects</h2>
+      <p>Mobile Eggbert is part of the <strong>OpenEggbert</strong> project collection. All projects live as siblings in the same parent directory.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Repository</th><th>Role</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>mobile-eggbert</td>
+              <td>C++ port of Speedy Blupi Windows Phone game (this project)</td>
+              <td><span class="badge green">Active</span></td>
+            </tr>
+            <tr>
+              <td>mobile-eggbert-legacy</td>
+              <td>Previous version of the port; decompiled C# source + MonoGame builds</td>
+              <td><span class="badge">Archive</span></td>
+            </tr>
+            <tr>
+              <td>mobile-eggbert-libgdx</td>
+              <td>Java/LibGDX port of the same game, ported from the C# XNA source</td>
+              <td><span class="badge blue">In Progress</span></td>
+            </tr>
+            <tr>
+              <td>cna</td>
+              <td>CNA framework — C++ XNA 4.0-compatible API wrapper built on SDL3</td>
+              <td><span class="badge green">Active</span></td>
+            </tr>
+            <tr>
+              <td>sharp-runtime</td>
+              <td>C++ reimplementation of .NET BCL types (String, List, Dictionary, Math, …)</td>
+              <td><span class="badge green">Active</span></td>
+            </tr>
+            <tr>
+              <td>planetblupi</td>
+              <td>Official open-source C++ source of Planet Blupi (isometric RTS, by Epsitec SA)</td>
+              <td><span class="badge">Reference</span></td>
+            </tr>
+            <tr>
+              <td>free-eggbert</td>
+              <td>Decompiled Speedy Eggbert 2 (DirectX 3 platform game)</td>
+              <td><span class="badge">Reference</span></td>
+            </tr>
+            <tr>
+              <td>free-direct</td>
+              <td>DirectDraw → SDL3 abstraction layer (used by free-eggbert port)</td>
+              <td><span class="badge green">Active</span></td>
+            </tr>
+            <tr>
+              <td>free-api</td>
+              <td>Win32 → cross-platform API abstraction layer</td>
+              <td><span class="badge green">Active</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout warn">
+        <strong>Important Distinction</strong>
+        Mobile Eggbert is <em>not</em> a fork of Planet Blupi or Free Eggbert. It is an independent C++ port that originated
+        specifically from the Windows Phone version of the game, not from any of the desktop Speedy Eggbert titles.
+      </div>
+
+      <h2 id="family">The Blupi Family of Games</h2>
+      <p>Blupi is a character created by Epsitec SA. Several distinct games feature Blupi:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Game</th><th>Year</th><th>Platform</th><th>Technology</th></tr></thead>
+          <tbody>
+            <tr><td>Planet Blupi</td><td>1997</td><td>DOS / Windows</td><td>DirectX, C++</td></tr>
+            <tr><td>Speedy Eggbert</td><td>2000</td><td>Windows</td><td>DirectX 3, C++</td></tr>
+            <tr><td>Speedy Eggbert 2</td><td>2001</td><td>Windows</td><td>DirectX 3, C++</td></tr>
+            <tr><td>Speedy Blupi (Windows Phone)</td><td>2013</td><td>Windows Phone 8</td><td>XNA 4.0, C#</td></tr>
+            <tr><td>Mobile Eggbert (this project)</td><td>2023+</td><td>Linux/Win/Web/Android</td><td>CNA/SDL3, C++23</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="license">License</h2>
+      <p>
+        Mobile Eggbert is licensed under the <strong>MIT License</strong>. The original Speedy Blupi game assets
+        (sprites, sounds, level data) remain property of Epsitec SA. Copyright for the C++ port code includes
+        contributions by Daniel Roux and the OpenEggbert contributors.
+      </p>
+
+    </main>
+    <footer>
+      Mobile Eggbert is based on <em>Speedy Blupi</em> by Epsitec SA &amp; Daniel Roux.
+      C++ port by the OpenEggbert project. MIT License.
+    </footer>
+  </div>
+</div>
+
+</body>
+</html>

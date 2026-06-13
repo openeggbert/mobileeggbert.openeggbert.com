@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mobile Eggbert — Documentation</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topnav">
+  <a class="brand" href="index.html">🐣 Mobile Eggbert</a>
+  <nav>
+    <a href="index.html" class="active">Overview</a>
+    <a href="history.html">History</a>
+    <a href="build.html">Build</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="api-enums.html">API Reference</a>
+    <a href="assets.html">Assets</a>
+    <a href="formats.html">Formats</a>
+    <a href="cheats.html">Cheats</a>
+    <a href="performance.html">Performance</a>
+  </nav>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h4>Getting Started</h4>
+    <a href="index.html" class="active">Overview</a>
+    <a href="history.html">Project History</a>
+    <a href="build.html">Build System</a>
+    <a href="config.html">Configuration</a>
+
+    <h4>Game Design</h4>
+    <a href="gameplay.html">Game Mechanics</a>
+    <a href="gameplay.html#phases">Phase System</a>
+    <a href="gameplay.html#vehicles">Vehicles</a>
+    <a href="gameplay.html#powerups">Power-Ups</a>
+    <a href="cheats.html">Cheat System</a>
+
+    <h4>Developer Reference</h4>
+    <a href="architecture.html">Architecture</a>
+    <a href="api-enums.html">Enumerations</a>
+    <a href="api-classes.html">Key Classes</a>
+    <a href="formats.html">Data Formats</a>
+    <a href="assets.html">Asset Files</a>
+
+    <h4>Other</h4>
+    <a href="localization.html">Localization</a>
+    <a href="performance.html">Performance</a>
+    <a href="todo.html">Known Issues</a>
+  </aside>
+
+  <div style="flex:1; min-width:0;">
+    <main>
+
+      <div class="hero">
+        <h1>Mobile Eggbert</h1>
+        <p>A faithful C++ port of <em>Speedy Blupi</em> — the Windows Phone XNA platform game from 2013. Multi-platform, open-source, and developer-friendly.</p>
+        <div class="badges">
+          <span class="badge accent">C++23</span>
+          <span class="badge green">CNA / SDL3</span>
+          <span class="badge blue">Linux · Windows · Web · Android</span>
+          <span class="badge">MIT License</span>
+        </div>
+      </div>
+
+      <h2>What is Mobile Eggbert?</h2>
+      <p>
+        <strong>Mobile Eggbert</strong> is a side-scrolling platform game in which the player controls <em>Blupi</em>
+        through 100×100-tile levels, collecting treasures, driving vehicles, using power-ups, and reaching the goal exit.
+        The game contains 78 levels organized into chapters, with a tutorial and a final bonus stage.
+      </p>
+      <p>
+        The codebase originated as the Windows Phone 8 XNA game <em>Speedy Blupi</em> (2013), was decompiled, migrated
+        to MonoGame, and subsequently rewritten in C++ using <strong>CNA</strong> — a custom XNA-compatible C++ framework
+        built on top of SDL3.
+      </p>
+
+      <h2>Quick Facts</h2>
+      <div class="grid-2">
+        <div>
+          <h3>Language & Framework</h3>
+          <ul>
+            <li>Primary language: <strong>C++23</strong></li>
+            <li>Framework: <strong>CNA</strong> (XNA 4.0 compatible, SDL3-based)</li>
+            <li>Build system: <strong>CMake 3.21+</strong></li>
+            <li>Executable: <code>WindowsPhoneSpeedyBlupi</code></li>
+          </ul>
+        </div>
+        <div>
+          <h3>Target Platforms</h3>
+          <div class="platforms">
+            <span class="platform">Linux</span>
+            <span class="platform">Windows</span>
+            <span class="platform">Web (WASM)</span>
+            <span class="platform">Android</span>
+          </div>
+          <p style="margin-top:10px; font-size:13px; color:var(--text-muted)">Linux is the primary development target. Web and Android use SDL_Renderer backend.</p>
+        </div>
+      </div>
+
+      <h2>Game Features</h2>
+      <div class="cards">
+        <a class="card" href="gameplay.html#vehicles">
+          <div class="card-icon">🚁</div>
+          <div class="card-title">5 Vehicles</div>
+          <div class="card-desc">Helicopter, Jeep, Tank, Hovercraft, Skateboard — each with unique physics</div>
+        </a>
+        <a class="card" href="gameplay.html#powerups">
+          <div class="card-icon">⚡</div>
+          <div class="card-title">Power-Ups</div>
+          <div class="card-desc">Shield, Lollipop boost, Cloud invisibility, Drink, Charge station</div>
+        </a>
+        <a class="card" href="gameplay.html#enemies">
+          <div class="card-icon">💣</div>
+          <div class="card-title">Enemies & Hazards</div>
+          <div class="card-desc">Bombs, bulldozers, wasps, fish, birds, glue, lava and electric zones</div>
+        </a>
+        <a class="card" href="gameplay.html#phases">
+          <div class="card-icon">🎮</div>
+          <div class="card-title">12 Game Phases</div>
+          <div class="card-desc">Full menu, settings, pause, checkpoint, ranking and win/loss screens</div>
+        </a>
+        <a class="card" href="assets.html">
+          <div class="card-icon">🖼️</div>
+          <div class="card-title">78 Levels</div>
+          <div class="card-desc">Tutorial + 9 chapters, 32 background themes, 4× high-DPI assets</div>
+        </a>
+        <a class="card" href="cheats.html">
+          <div class="card-icon">🔑</div>
+          <div class="card-title">22 Cheat Codes</div>
+          <div class="card-desc">Hidden unlock gesture + full cheat panel with 9 action buttons</div>
+        </a>
+      </div>
+
+      <h2>Documentation Map</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Section</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><a href="history.html">History</a></td><td>How the codebase evolved from C# XNA → MonoGame → C++ → CNA, and how it relates to Planet Blupi / Free Eggbert</td></tr>
+            <tr><td><a href="build.html">Build System</a></td><td>Step-by-step build instructions for Linux, Windows (MinGW), Web (Emscripten) and Android</td></tr>
+            <tr><td><a href="config.html">Configuration</a></td><td>LEGACY vs MODERN mode, FPS settings, resolution scaling, time and speed scale factors</td></tr>
+            <tr><td><a href="architecture.html">Architecture</a></td><td>Repository layout, dependency graph, key class responsibilities</td></tr>
+            <tr><td><a href="gameplay.html">Gameplay</a></td><td>Phase state machine, vehicles, power-ups, enemies, keys and doors</td></tr>
+            <tr><td><a href="api-enums.html">API: Enumerations</a></td><td>All enum types: BlupiAction (88), ObjectType (203+), SoundChannel (93), PixmapChannel (17), …</td></tr>
+            <tr><td><a href="api-classes.html">API: Classes</a></td><td>Decor, Game1, Pixmap, InputPad, GameData, Worlds, Tables — purpose and key members</td></tr>
+            <tr><td><a href="formats.html">Data Formats</a></td><td>World file text format (100×100 grid), save data binary layout (640 bytes, 3 gamer slots)</td></tr>
+            <tr><td><a href="assets.html">Asset Files</a></td><td>All PNG sprite sheets, WAV sounds, world level files — naming conventions and sizes</td></tr>
+            <tr><td><a href="cheats.html">Cheat System</a></td><td>Hidden unlock gesture, 9 UI buttons, full list of 22 cheat codes</td></tr>
+            <tr><td><a href="localization.html">Localization</a></td><td>French, English and German UI strings in MyResource.cpp</td></tr>
+            <tr><td><a href="performance.html">Performance</a></td><td>4 known O(n) issues in Decor.cpp with suggested fixes</td></tr>
+            <tr><td><a href="todo.html">Known Issues</a></td><td>Open bugs and TODO items from TODO.md, ENUMS.md, and DOXYGEN_DOCUMENTATION_PLAN.md</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2>Repository Quick Reference</h2>
+      <pre><code>mobile-eggbert/
+├── include/WindowsPhoneSpeedyBlupi/   ← all .hpp headers
+│   ├── def/                           ← enum headers (BlupiAction, ObjectType, …)
+│   └── decor/                         ← decor-specific enums
+├── src/WindowsPhoneSpeedyBlupi/       ← all .cpp implementations
+├── Content/                           ← PNG sprites + WAV sounds
+│   ├── backgrounds/                   ← 37 background PNGs (32 themes + UI)
+│   ├── icons/                         ← 8 sprite-sheet PNGs
+│   └── sounds/                        ← 92 WAV sound effects
+└── worlds/                            ← 78 level text files</code></pre>
+
+      <div class="callout info">
+        <strong>Developer Note</strong>
+        This documentation was generated from DOC.md and covers the C++ port. A parallel Java/LibGDX port
+        (<code>mobile-eggbert-libgdx</code>) also exists and shares the same game logic design.
+      </div>
+
+    </main>
+    <footer>
+      Mobile Eggbert is based on <em>Speedy Blupi</em> by Epsitec SA &amp; Daniel Roux.
+      C++ port by the OpenEggbert project. MIT License.
+    </footer>
+  </div>
+</div>
+
+</body>
+</html>

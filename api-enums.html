@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API: Enumerations — Mobile Eggbert</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topnav">
+  <a class="brand" href="index.html">🐣 Mobile Eggbert</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="history.html">History</a>
+    <a href="build.html">Build</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="api-enums.html" class="active">API Reference</a>
+    <a href="assets.html">Assets</a>
+    <a href="formats.html">Formats</a>
+    <a href="cheats.html">Cheats</a>
+    <a href="performance.html">Performance</a>
+  </nav>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h4>Enumerations</h4>
+    <a href="#blupiaction">BlupiAction (88)</a>
+    <a href="#objecttype">ObjectType (203+)</a>
+    <a href="#soundchannel">SoundChannel (93)</a>
+    <a href="#pixmapchannel">PixmapChannel (17)</a>
+    <a href="#keypressflags">KeyPressFlags</a>
+    <a href="#secretpower">SecretPower</a>
+    <a href="#direction">Direction</a>
+    <a href="#gamespeed">GameSpeed</a>
+    <a href="#decoraction">DecorAction</a>
+    <a href="#doorkeyflags">DoorKeyFlags</a>
+    <a href="#buttonglyph">ButtonGlyph</a>
+    <a href="#zoom">Zoom</a>
+    <a href="#phase">Phase</a>
+
+    <h4>Other Reference</h4>
+    <a href="api-classes.html">Key Classes</a>
+  </aside>
+
+  <div style="flex:1; min-width:0;">
+    <main>
+      <h1>API Reference: Enumerations</h1>
+      <p>All enum types defined in <code>include/WindowsPhoneSpeedyBlupi/def/</code> and <code>include/WindowsPhoneSpeedyBlupi/decor/</code>.</p>
+
+      <!-- BLUPIACTION -->
+      <h2 id="blupiaction">BlupiAction — Player Animation States</h2>
+      <div class="enum-header">
+        <span class="enum-name">enum class BlupiAction</span>
+        <span class="enum-file">include/WindowsPhoneSpeedyBlupi/def/BlupiAction.hpp</span>
+      </div>
+      <p>88 states covering every animation Blupi can perform. Drives sprite selection via the Tables animation table.</p>
+
+      <h3>Standing and Walking</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Value</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>Stop</code></td><td>Standing still</td></tr>
+          <tr><td><code>March</code></td><td>Walking</td></tr>
+          <tr><td><code>Turn</code></td><td>Turning around</td></tr>
+          <tr><td><code>StopMarch</code></td><td>Stopping from a walk</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Jumping and Falling</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Value</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>Jump</code></td><td>Beginning of jump</td></tr>
+          <tr><td><code>Air</code></td><td>In the air (mid-jump)</td></tr>
+          <tr><td><code>StopJump</code></td><td>Landing from jump</td></tr>
+          <tr><td><code>StopJumph</code></td><td>Landing variant</td></tr>
+          <tr><td><code>TurnAir</code></td><td>Turning in mid-air</td></tr>
+          <tr><td><code>Vertigo</code></td><td>Edge vertigo ("whoops")</td></tr>
+          <tr><td><code>Recede / Advance</code></td><td>Backing away from / advancing on edge</td></tr>
+          <tr><td><code>Recedeq / Advanceq</code></td><td>Quick recede / advance</td></tr>
+          <tr><td><code>JumpAie</code></td><td>Headache upon landing</td></tr>
+          <tr><td><code>Teleporte</code></td><td>Teleporting</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Helicopter</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Value</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>StopHelico</code></td><td>Hovering (helicopter stopped)</td></tr>
+          <tr><td><code>MarchHelico</code></td><td>Flying (helicopter in motion)</td></tr>
+          <tr><td><code>TurnHelico</code></td><td>Turning in helicopter</td></tr>
+          <tr><td><code>HelicoGlu</code></td><td>Glued while in helicopter</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Swimming</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Value</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>StopNage / MarchNage / TurnNage</code></td><td>Deep water (stopped / moving / turning)</td></tr>
+          <tr><td><code>StopSurf / MarchSurf / TurnSurf</code></td><td>Water surface (stopped / moving / turning)</td></tr>
+          <tr><td><code>Drown</code></td><td>Drowning animation</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Jeep, Skateboard, Tank, Hovercraft, Bar-Hanging, Crate Push/Pull</h3>
+      <p>Each vehicle/activity has a Stop/March/Turn triple (and Jump/Fire variants for relevant vehicles). See <a href="gameplay.html#vehicles">Gameplay: Vehicles</a> for the full breakdown.</p>
+
+      <h3>Power-Up Effects</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Value</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>Sucette</code></td><td>Eating lollipop (power boost)</td></tr>
+          <tr><td><code>Glu</code></td><td>Glued / trapped</td></tr>
+          <tr><td><code>Drink</code></td><td>Drinking animation</td></tr>
+          <tr><td><code>Charge</code></td><td>Charging up animation</td></tr>
+          <tr><td><code>Electro</code></td><td>Electrocuted</td></tr>
+          <tr><td><code>Balloon</code></td><td>Stung by wasp (swelling)</td></tr>
+          <tr><td><code>Hide</code></td><td>Invisible (cloud power)</td></tr>
+          <tr><td><code>StopEcrase / MarchEcrase</code></td><td>Flattened (standing / moving)</td></tr>
+          <tr><td><code>Switch</code></td><td>Switch interaction</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Reactions</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Value</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>Win</code></td><td>Victory animation</td></tr>
+          <tr><td><code>Bye</code></td><td>"au au" farewell</td></tr>
+          <tr><td><code>Mockery / Mockeryi</code></td><td>Mockery taunt / variant i</td></tr>
+          <tr><td><code>Down / Up</code></td><td>Looking down / up</td></tr>
+          <tr><td><code>Ouf1a / Ouf1b / Ouf2 / Ouf4 / Ouf5</code></td><td>Relief expressions</td></tr>
+          <tr><td><code>Set</code></td><td>Set state</td></tr>
+          <tr><td><code>Clear1–Clear8</code></td><td>Unused clear animation slots</td></tr>
+        </tbody>
+      </table></div>
+
+      <hr>
+
+      <!-- OBJECTTYPE -->
+      <h2 id="objecttype">ObjectType — Moving Game Objects</h2>
+      <div class="enum-header">
+        <span class="enum-name">enum class ObjectType</span>
+        <span class="enum-file">include/WindowsPhoneSpeedyBlupi/decor/ObjectType.hpp</span>
+      </div>
+      <p>203+ types for enemies, collectibles, vehicles, effects, and projectiles. Up to 200 can be active simultaneously.</p>
+
+      <div class="table-wrap"><table>
+        <thead><tr><th>Value</th><th>ID</th><th>Category</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>Ascenseur</code></td><td>1</td><td>Platform</td><td>Standard lift</td></tr>
+          <tr><td><code>AscenseurS</code></td><td>47</td><td>Platform</td><td>Conveyor belt moving right</td></tr>
+          <tr><td><code>AscenseurSi</code></td><td>48</td><td>Platform</td><td>Conveyor belt moving left</td></tr>
+          <tr><td><code>BombeDown</code></td><td>2</td><td>Enemy</td><td>Floor bomb</td></tr>
+          <tr><td><code>BombeUp</code></td><td>3</td><td>Enemy</td><td>Hanging bomb</td></tr>
+          <tr><td><code>BombeMove</code></td><td>16</td><td>Enemy</td><td>Moving bomb</td></tr>
+          <tr><td><code>BombeFollow1/2</code></td><td>96–97</td><td>Enemy</td><td>Homing bomb (stopped/moving)</td></tr>
+          <tr><td><code>Bulldozer</code></td><td>4</td><td>Enemy</td><td>Bulldozer</td></tr>
+          <tr><td><code>Poisson</code></td><td>17</td><td>Enemy</td><td>Fish (aquatic)</td></tr>
+          <tr><td><code>Oiseau</code></td><td>20</td><td>Enemy</td><td>Bird (aerial)</td></tr>
+          <tr><td><code>Guepe</code></td><td>44</td><td>Enemy</td><td>Wasp</td></tr>
+          <tr><td><code>Tentacule</code></td><td>53</td><td>Enemy</td><td>Slime tentacle</td></tr>
+          <tr><td><code>Creature</code></td><td>54</td><td>Enemy</td><td>Moving slime creature</td></tr>
+          <tr><td><code>Tresor</code></td><td>5</td><td>Collectible</td><td>Treasure (level objective)</td></tr>
+          <tr><td><code>Egg</code></td><td>6</td><td>Collectible</td><td>Extra life egg</td></tr>
+          <tr><td><code>Goal</code></td><td>7</td><td>Collectible</td><td>Level exit marker</td></tr>
+          <tr><td><code>Cle</code></td><td>21</td><td>Collectible</td><td>Gold key</td></tr>
+          <tr><td><code>Cle1/2/3</code></td><td>49–51</td><td>Collectible</td><td>Red / Green / Blue key</td></tr>
+          <tr><td><code>Helico</code></td><td>13</td><td>Vehicle</td><td>Helicopter</td></tr>
+          <tr><td><code>BlupiHelico</code></td><td>32</td><td>Vehicle</td><td>Player inside helicopter</td></tr>
+          <tr><td><code>Jeep</code></td><td>19</td><td>Vehicle</td><td>Jeep</td></tr>
+          <tr><td><code>Tank</code></td><td>28</td><td>Vehicle</td><td>Tank</td></tr>
+          <tr><td><code>BlupiTank</code></td><td>33</td><td>Vehicle</td><td>Player inside tank</td></tr>
+          <tr><td><code>Over</code></td><td>46</td><td>Vehicle</td><td>Hovercraft</td></tr>
+          <tr><td><code>Caisse</code></td><td>12</td><td>Interactive</td><td>Pushable/pullable crate</td></tr>
+          <tr><td><code>Skate</code></td><td>24</td><td>Interactive</td><td>Skateboard</td></tr>
+          <tr><td><code>Door</code></td><td>22</td><td>Interactive</td><td>Door (requires key)</td></tr>
+          <tr><td><code>Bridge</code></td><td>52</td><td>Interactive</td><td>Fragile bridge</td></tr>
+          <tr><td><code>Shield</code></td><td>25</td><td>Power-up</td><td>Shield</td></tr>
+          <tr><td><code>Power</code></td><td>26</td><td>Power-up</td><td>Lollipop</td></tr>
+          <tr><td><code>Drink</code></td><td>30</td><td>Power-up</td><td>Drinkable item</td></tr>
+          <tr><td><code>Charge</code></td><td>31</td><td>Power-up</td><td>Charging device</td></tr>
+          <tr><td><code>Dynamite</code></td><td>55</td><td>Power-up</td><td>Dynamite stick</td></tr>
+          <tr><td><code>DynamiteF</code></td><td>56</td><td>Power-up</td><td>Lit dynamite (armed)</td></tr>
+          <tr><td><code>Balle</code></td><td>23</td><td>Projectile</td><td>Glue ball</td></tr>
+          <tr><td><code>Bullet</code></td><td>29</td><td>Projectile</td><td>Tank bullet</td></tr>
+          <tr><td><code>Explo1–4</code></td><td>8–11</td><td>Effect</td><td>Explosion effects 1–4</td></tr>
+          <tr><td><code>Explo5–10</code></td><td>90–95</td><td>Effect</td><td>Explosion effects 5–10</td></tr>
+          <tr><td><code>Sploutch1–3</code></td><td>98–100</td><td>Effect</td><td>Splat particle effects</td></tr>
+          <tr><td><code>Invert / InvertStart / InvertStop / InvertSpin</code></td><td>40–43</td><td>Effect</td><td>Controls-inversion states</td></tr>
+          <tr><td><code>Plouf / TiPlouf</code></td><td>14, 35</td><td>Water</td><td>Big / small water splash</td></tr>
+          <tr><td><code>Blup</code></td><td>15</td><td>Water</td><td>Underwater bubble</td></tr>
+          <tr><td><code>Glu</code></td><td>34</td><td>Water</td><td>Glue blob</td></tr>
+          <tr><td><code>BombePerso1–4</code></td><td>200–203</td><td>Multiplayer</td><td>Personal bombs (yellow/orange/blue/green)</td></tr>
+        </tbody>
+      </table></div>
+
+      <hr>
+
+      <!-- SOUNDCHANNEL -->
+      <h2 id="soundchannel">SoundChannel — Sound Effect Slots</h2>
+      <div class="enum-header">
+        <span class="enum-name">enum class SoundChannel</span>
+        <span class="enum-file">include/WindowsPhoneSpeedyBlupi/def/SoundChannel.hpp</span>
+      </div>
+      <p>93 slots (<code>Sound0</code>–<code>Sound92</code>) mapping to <code>Content/sounds/sound000.wav</code>–<code>sound091.wav</code>. <code>Sound0</code> is reserved. <code>SoundN</code> maps to file <code>sound(N-1).wav</code>.</p>
+
+      <div class="table-wrap"><table>
+        <thead><tr><th>Range</th><th>Category</th></tr></thead>
+        <tbody>
+          <tr><td>Sound1–4</td><td>Jump variants (low/medium/high, stone landing)</td></tr>
+          <tr><td>Sound5–8</td><td>Turn, vertigo, look-down, fall</td></tr>
+          <tr><td>Sound9</td><td>Respawn</td></tr>
+          <tr><td>Sound10–14</td><td>Explosion, treasure, egg, level lost, level won</td></tr>
+          <tr><td>Sound15–18</td><td>Helicopter start/high/stop/low</td></tr>
+          <tr><td>Sound19</td><td>Last treasure collected</td></tr>
+          <tr><td>Sound23–26</td><td>Big splash, bubble, surface inhale, drown</td></tr>
+          <tr><td>Sound27</td><td>Error / invalid action</td></tr>
+          <tr><td>Sound28–31</td><td>Jeep start/high/stop/low</td></tr>
+          <tr><td>Sound32–35</td><td>"Au au" bye, door creak, grab bar, pull up from bar</td></tr>
+          <tr><td>Sound36–40</td><td>Singe, patience, push crate, pull crate, headache</td></tr>
+          <tr><td>Sound41</td><td>Spring bounce</td></tr>
+          <tr><td>Sound42–45</td><td>Shield on/off, lollipop on/off</td></tr>
+          <tr><td>Sound46–49</td><td>Relief expressions (exit water, scared, groan, shriek)</td></tr>
+          <tr><td>Sound50–54</td><td>Lollipop lick, glue, tank fire ok/fail, pick up glue</td></tr>
+          <tr><td>Sound55–59</td><td>Cloud start/stop, drink, charge, electro</td></tr>
+          <tr><td>Sound60–63</td><td>Personal bomb take/place, hide start/stop</td></tr>
+          <tr><td>Sound64–67</td><td>Small splash, mockery, controls invert start/stop</td></tr>
+          <tr><td>Sound68–71</td><td>Hovercraft stall, lightning, squish, teleport</td></tr>
+          <tr><td>Sound72–77</td><td>Bridge fall/appear, angel, saw, switch off/on</td></tr>
+          <tr><td>Sound78–91</td><td>Surface footstep pairs: wood, metal, cave, slime, plastic, cheese, grass</td></tr>
+          <tr><td>Sound92</td><td>Homing bomb beep</td></tr>
+        </tbody>
+      </table></div>
+
+      <hr>
+
+      <!-- PIXMAPCHANNEL -->
+      <h2 id="pixmapchannel">PixmapChannel — Sprite Sheet Channels</h2>
+      <div class="enum-header">
+        <span class="enum-name">enum class PixmapChannel</span>
+        <span class="enum-file">include/WindowsPhoneSpeedyBlupi/def/PixmapChannel.hpp</span>
+      </div>
+      <p>17 named sprite-sheet surfaces managed by <code>CPixmap</code>. Channels 7 and 8 are reserved/unused.</p>
+
+      <div class="table-wrap"><table>
+        <thead><tr><th>Enum</th><th>Value</th><th>File</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>Object</code></td><td>1</td><td>icons/object.png</td><td>Foreground objects, pickups, enemies</td></tr>
+          <tr><td><code>Blupi</code></td><td>2</td><td>icons/blupi.png</td><td>Default player character (88 actions)</td></tr>
+          <tr><td><code>Background</code></td><td>3</td><td>backgrounds/decorNNN.png</td><td>Level terrain background</td></tr>
+          <tr><td><code>Button</code></td><td>4</td><td>icons/button.png</td><td>On-screen UI buttons (40×40 px)</td></tr>
+          <tr><td><code>Jauge</code></td><td>5</td><td>icons/jauge.png</td><td>HUD gauge bar (124×22 px)</td></tr>
+          <tr><td><code>Text</code></td><td>6</td><td>icons/text.png</td><td>Bitmap font (32×32 px cells)</td></tr>
+          <tr><td><code>Explosion</code></td><td>9</td><td>icons/explo.png</td><td>Explosions and visual effects</td></tr>
+          <tr><td><code>Element</code></td><td>10</td><td>icons/element.png</td><td>Collectibles and particle effects</td></tr>
+          <tr><td><code>Blupi1_11</code></td><td>11</td><td>icons/blupi1.png</td><td>Player character variant 1</td></tr>
+          <tr><td><code>Blupi1_12</code></td><td>12</td><td>—</td><td>Player character variant 2</td></tr>
+          <tr><td><code>Blupi1_13</code></td><td>13</td><td>—</td><td>Player character variant 3</td></tr>
+          <tr><td><code>Pad</code></td><td>14</td><td>—</td><td>Touch control pad overlay</td></tr>
+          <tr><td><code>SpeedyBlupiBackground</code></td><td>15</td><td>backgrounds/speedyblupi.png</td><td>Title screen (Speedy Blupi logo)</td></tr>
+          <tr><td><code>BlupiYoupieBackground</code></td><td>16</td><td>backgrounds/blupiyoupie.png</td><td>Title screen (Blupi Youpie)</td></tr>
+          <tr><td><code>GearBackground</code></td><td>17</td><td>backgrounds/gear.png</td><td>Settings/gear screen background</td></tr>
+        </tbody>
+      </table></div>
+
+      <hr>
+
+      <!-- KEYPRESSFLAGS -->
+      <h2 id="keypressflags">KeyPressFlags — Input Bitmask</h2>
+      <div class="enum-header">
+        <span class="enum-name">enum class KeyPressFlags</span>
+        <span class="enum-file">include/WindowsPhoneSpeedyBlupi/def/KeyPressFlags.hpp</span>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Flag</th><th>Bit</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>Jump</code></td><td>bit 0 (1)</td><td>Jump button pressed</td></tr>
+          <tr><td><code>Fire</code></td><td>bit 1 (2)</td><td>Fire/action button pressed</td></tr>
+          <tr><td><code>Down</code></td><td>bit 2 (4)</td><td>Look-down / crouch button pressed</td></tr>
+        </tbody>
+      </table></div>
+      <p>Direction (left/right) is handled separately via the <code>Direction</code> enum and <code>InputPad</code>.</p>
+
+      <hr>
+
+      <!-- SECRETPOWER -->
+      <h2 id="secretpower">SecretPower — Active Power-Ups</h2>
+      <div class="enum-header">
+        <span class="enum-name">enum class SecretPower</span>
+        <span class="enum-file">include/WindowsPhoneSpeedyBlupi/def/SecretPower.hpp</span>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Value</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>None</code></td><td>No power-up active</td></tr>
+          <tr><td><code>Shield</code></td><td>Shield active — damage protection, 100-tick timer</td></tr>
+          <tr><td><code>Power</code></td><td>Lollipop active — strength boost</td></tr>
+          <tr><td><code>Cloud</code></td><td>Cloud invisibility active</td></tr>
+          <tr><td><code>Hide</code></td><td>Hidden state active</td></tr>
+        </tbody>
+      </table></div>
+
+      <hr>
+
+      <!-- DIRECTION -->
+      <h2 id="direction">Direction</h2>
+      <div class="enum-header">
+        <span class="enum-name">enum class Direction</span>
+        <span class="enum-file">include/WindowsPhoneSpeedyBlupi/def/Direction.hpp</span>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Value</th><th>Int</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>None</code></td><td>0</td><td>Unset / initial state</td></tr>
+          <tr><td><code>Left</code></td><td>1</td><td>Facing / moving left</td></tr>
+          <tr><td><code>Right</code></td><td>2</td><td>Facing / moving right</td></tr>
+        </tbody>
+      </table></div>
+
+      <hr>
+
+      <!-- GAMESPEED -->
+      <h2 id="gamespeed">GameSpeed</h2>
+      <div class="enum-header">
+        <span class="enum-name">enum class GameSpeed</span>
+        <span class="enum-file">include/WindowsPhoneSpeedyBlupi/def/GameSpeed.hpp</span>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Value</th><th>Multiplier</th></tr></thead>
+        <tbody>
+          <tr><td><code>Slow</code></td><td>0.5×</td></tr>
+          <tr><td><code>Normal</code></td><td>1.0× (original)</td></tr>
+          <tr><td><code>Fast</code></td><td>2.0×</td></tr>
+          <tr><td><code>Faster</code></td><td>3.0×</td></tr>
+          <tr><td><code>Fastest</code></td><td>4.0×</td></tr>
+        </tbody>
+      </table></div>
+
+      <hr>
+
+      <!-- DECORACTION -->
+      <h2 id="decoraction">DecorAction — Camera Shake</h2>
+      <div class="enum-header">
+        <span class="enum-name">enum class DecorAction</span>
+        <span class="enum-file">include/WindowsPhoneSpeedyBlupi/decor/DecorAction.hpp</span>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Value</th><th>Int</th><th>Trigger</th></tr></thead>
+        <tbody>
+          <tr><td><code>None</code></td><td>0</td><td>No shake</td></tr>
+          <tr><td><code>SmallShake</code></td><td>1</td><td>Minor impact (crate landing, bonus collection)</td></tr>
+          <tr><td><code>BigShake</code></td><td>2</td><td>Major impact (fan blade hit, large explosion)</td></tr>
+          <tr><td><code>ElectricShake</code></td><td>5</td><td>Electric contact</td></tr>
+        </tbody>
+      </table></div>
+
+      <hr>
+
+      <!-- DOORKEYFLAGS -->
+      <h2 id="doorkeyflags">DoorKeyFlags — Key Bitmask</h2>
+      <div class="enum-header">
+        <span class="enum-name">enum class DoorKeyFlags</span>
+        <span class="enum-file">include/WindowsPhoneSpeedyBlupi/decor/DoorKeyFlags.hpp</span>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Value</th><th>Int</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>None</code></td><td>0</td><td>No keys held</td></tr>
+          <tr><td><code>Key1</code></td><td>1 (bit 0)</td><td>Red key</td></tr>
+          <tr><td><code>Key2</code></td><td>2 (bit 1)</td><td>Green key</td></tr>
+          <tr><td><code>Key3</code></td><td>4 (bit 2)</td><td>Blue key</td></tr>
+          <tr><td><code>All</code></td><td>7</td><td>All three keys</td></tr>
+        </tbody>
+      </table></div>
+
+      <hr>
+
+      <!-- BUTTONGLYPH -->
+      <h2 id="buttonglyph">ButtonGlyph — UI Buttons</h2>
+      <p>39 named buttons dispatched by <code>Game1</code>. Groups by screen:</p>
+      <div class="grid-2">
+        <div>
+          <h4>Main Menu (Init)</h4>
+          <ul>
+            <li><code>InitGamerA/B/C</code> — gamer slot selection</li>
+            <li><code>InitSetup</code> — open settings</li>
+            <li><code>InitPlay</code> — start game</li>
+            <li><code>InitBuy</code> — purchase full game</li>
+            <li><code>InitRanking</code> — show high scores</li>
+          </ul>
+
+          <h4>Pause Menu</h4>
+          <ul>
+            <li><code>PauseMenu</code> — return to main menu</li>
+            <li><code>PauseBack</code> — close pause</li>
+            <li><code>PauseSetup</code> — settings from pause</li>
+            <li><code>PauseRestart</code> — restart level</li>
+            <li><code>PauseContinue</code> — resume</li>
+          </ul>
+        </div>
+        <div>
+          <h4>In-Game HUD</h4>
+          <ul>
+            <li><code>PlayPause</code> — open pause</li>
+            <li><code>PlayJump</code> — jump (touch)</li>
+            <li><code>PlayAction</code> — fire/action (touch)</li>
+            <li><code>PlayDown</code> — look-down (touch)</li>
+          </ul>
+
+          <h4>Settings</h4>
+          <ul>
+            <li><code>SetupSounds / SetupJump / SetupZoom / SetupAccel / SetupReset / SetupReturn</code></li>
+          </ul>
+
+          <h4>Cheat Grid</h4>
+          <ul>
+            <li><code>Cheat11/12/21/22/31/32</code> — 3×2 unlock grid</li>
+            <li><code>Cheat1–Cheat9</code> — 9 cheat action buttons</li>
+          </ul>
+        </div>
+      </div>
+
+      <hr>
+
+      <!-- ZOOM -->
+      <h2 id="zoom">Zoom — Resolution Scale</h2>
+      <div class="enum-header">
+        <span class="enum-name">enum class Zoom</span>
+        <span class="enum-file">include/WindowsPhoneSpeedyBlupi/def/Zoom.hpp</span>
+      </div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Value</th><th>Scale</th><th>Resolution</th></tr></thead>
+        <tbody>
+          <tr><td><code>ScaleResolution1</code></td><td>1×</td><td>640×480 (default)</td></tr>
+          <tr><td><code>ScaleResolution2</code></td><td>2×</td><td>1280×960</td></tr>
+          <tr><td><code>ScaleResolution4</code></td><td>4×</td><td>2560×1920</td></tr>
+        </tbody>
+      </table></div>
+
+      <hr>
+
+      <!-- PHASE -->
+      <h2 id="phase">Phase — Game Phase State Machine</h2>
+      <div class="enum-header">
+        <span class="enum-name">enum class Def::Phase</span>
+        <span class="enum-file">include/WindowsPhoneSpeedyBlupi/Def.hpp</span>
+      </div>
+      <p>See <a href="gameplay.html#phases">Gameplay: Phase System</a> for the full table with descriptions.</p>
+
+    </main>
+    <footer>
+      Mobile Eggbert is based on <em>Speedy Blupi</em> by Epsitec SA &amp; Daniel Roux.
+      C++ port by the OpenEggbert project. MIT License.
+    </footer>
+  </div>
+</div>
+
+</body>
+</html>

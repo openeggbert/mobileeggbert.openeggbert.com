@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cheat System — Mobile Eggbert</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topnav">
+  <a class="brand" href="index.html">🐣 Mobile Eggbert</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="history.html">History</a>
+    <a href="build.html">Build</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="api-enums.html">API Reference</a>
+    <a href="assets.html">Assets</a>
+    <a href="formats.html">Formats</a>
+    <a href="cheats.html" class="active">Cheats</a>
+    <a href="performance.html">Performance</a>
+  </nav>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h4>On This Page</h4>
+    <a href="#overview">Overview</a>
+    <a href="#unlock">Unlock Gesture</a>
+    <a href="#buttons">Cheat Buttons</a>
+    <a href="#codes">All Cheat Codes</a>
+    <a href="#implementation">Implementation</a>
+  </aside>
+
+  <div style="flex:1; min-width:0;">
+    <main>
+      <h1>Cheat System</h1>
+      <p>Mobile Eggbert includes a hidden cheat panel accessible through a secret gesture. The system is documented in <code>documentation/Cheat System.md</code>.</p>
+
+      <div class="callout warn">
+        <strong>Spoilers Ahead</strong>
+        This page documents the complete cheat system including the unlock gesture. Only read if you intend to use cheats for development or testing.
+      </div>
+
+      <h2 id="overview">Overview</h2>
+      <p>The cheat panel consists of:</p>
+      <ol>
+        <li>A <strong>3×2 hidden button grid</strong> on the main menu (or accessible screen) used to enter the unlock gesture</li>
+        <li>A <strong>panel of 9 cheat action buttons</strong> (<code>Cheat1</code>–<code>Cheat9</code>) that becomes visible after unlocking</li>
+        <li>A set of <strong>22 cheat code strings</strong> stored in <code>Tables::CheatCodes</code></li>
+      </ol>
+
+      <h2 id="unlock">Unlock Gesture</h2>
+      <p>The cheat menu is unlocked by pressing a specific 10-button sequence on the 3×2 cheat grid. The grid layout is:</p>
+
+      <div style="display:grid; grid-template-columns:repeat(3, 80px); gap:8px; margin:20px 0; width:fit-content;">
+        <div style="background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:12px; text-align:center; font-family:monospace; font-size:13px; color:var(--accent);">Cheat11</div>
+        <div style="background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:12px; text-align:center; font-family:monospace; font-size:13px; color:var(--accent);">Cheat21</div>
+        <div style="background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:12px; text-align:center; font-family:monospace; font-size:13px; color:var(--accent);">Cheat31</div>
+        <div style="background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:12px; text-align:center; font-family:monospace; font-size:13px; color:var(--accent);">Cheat12</div>
+        <div style="background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:12px; text-align:center; font-family:monospace; font-size:13px; color:var(--accent);">Cheat22</div>
+        <div style="background:var(--bg3); border:1px solid var(--border); border-radius:var(--radius); padding:12px; text-align:center; font-family:monospace; font-size:13px; color:var(--accent);">Cheat32</div>
+      </div>
+
+      <p><em>Naming: first digit = column (1–3), second digit = row (1–2)</em></p>
+
+      <p>The required 10-button sequence to unlock the cheat panel:</p>
+
+      <div style="background:var(--code-bg); border:1px solid var(--border); border-radius:var(--radius); padding:16px 20px; margin:16px 0; font-family:monospace; font-size:14px; color:var(--accent);">
+        Cheat12 → Cheat22 → Cheat32 → Cheat12 → Cheat11 →
+        Cheat21 → Cheat22 → Cheat21 → Cheat31 → Cheat32
+      </div>
+
+      <h2 id="buttons">Cheat Action Buttons</h2>
+      <p>After unlocking, 9 action buttons appear. Each maps to a cheat action in <code>Game1::CheatAction()</code>:</p>
+
+      <div class="table-wrap"><table>
+        <thead><tr><th>Button</th><th>Cheat Name</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td><code>Cheat1</code></td><td>OpenDoors</td><td>Toggle all doors open/closed in the current level</td></tr>
+          <tr><td><code>Cheat2</code></td><td>SuperBlupi</td><td>Toggle enhanced player abilities (god-mode variant)</td></tr>
+          <tr><td><code>Cheat3</code></td><td>ShowSecret</td><td>Toggle display of hidden/secret objects</td></tr>
+          <tr><td><code>Cheat4</code></td><td>LayEgg</td><td>Set lives to 9</td></tr>
+          <tr><td><code>Cheat5</code></td><td>Reset</td><td>Reset all game data (all 3 gamer slots)</td></tr>
+          <tr><td><code>Cheat6</code></td><td>TrialMode</td><td>Toggle trial mode simulation (shows paywall screen)</td></tr>
+          <tr><td><code>Cheat7</code></td><td>CleanAll</td><td>Clear all objects from the current map</td></tr>
+          <tr><td><code>Cheat8</code></td><td>AllTreasure</td><td>Grant all treasures (level immediately completable)</td></tr>
+          <tr><td><code>Cheat9</code></td><td>EndGoal</td><td>Instantly complete the current level</td></tr>
+        </tbody>
+      </table></div>
+
+      <h2 id="codes">All 22 Cheat Codes</h2>
+      <p>The full list of cheat code strings stored in <code>Tables::CheatCodes[22]</code> (used by <code>Game1::CheatAction()</code>):</p>
+
+      <div class="table-wrap"><table>
+        <thead><tr><th>#</th><th>Cheat Code</th><th>Effect</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><code>BuildOfficialMissions</code></td><td>Build/restore official mission set</td></tr>
+          <tr><td>2</td><td><code>OpenDoors</code></td><td>Open all doors</td></tr>
+          <tr><td>3</td><td><code>CleanAll</code></td><td>Clear all objects from map</td></tr>
+          <tr><td>4</td><td><code>SuperBlupi</code></td><td>Super Blupi mode</td></tr>
+          <tr><td>5</td><td><code>LayEgg</code></td><td>Grant 9 lives</td></tr>
+          <tr><td>6</td><td><code>KillEgg</code></td><td>Remove all eggs from level</td></tr>
+          <tr><td>7</td><td><code>Skate</code></td><td>Spawn skateboard</td></tr>
+          <tr><td>8</td><td><code>Copter</code></td><td>Spawn helicopter</td></tr>
+          <tr><td>9</td><td><code>Jeep</code></td><td>Spawn jeep</td></tr>
+          <tr><td>10</td><td><code>AllTreasure</code></td><td>Grant all treasures</td></tr>
+          <tr><td>11</td><td><code>EndGoal</code></td><td>Complete level</td></tr>
+          <tr><td>12</td><td><code>ShowSecret</code></td><td>Show hidden objects</td></tr>
+          <tr><td>13</td><td><code>RoundShield</code></td><td>Grant shield power-up</td></tr>
+          <tr><td>14</td><td><code>Lollipop</code></td><td>Grant lollipop power-up</td></tr>
+          <tr><td>15</td><td><code>Bombs</code></td><td>Grant personal bombs</td></tr>
+          <tr><td>16</td><td><code>BirdLime</code></td><td>Bird-lime / glue special</td></tr>
+          <tr><td>17</td><td><code>Tank</code></td><td>Spawn tank</td></tr>
+          <tr><td>18</td><td><code>PowerCharge</code></td><td>Grant charge power</td></tr>
+          <tr><td>19</td><td><code>Drink</code></td><td>Grant drink power-up</td></tr>
+          <tr><td>20</td><td><code>Overcraft</code></td><td>Spawn hovercraft</td></tr>
+          <tr><td>21</td><td><code>Dynamite</code></td><td>Grant dynamite</td></tr>
+          <tr><td>22</td><td><code>WeelKeys</code></td><td>Grant all 3 keys</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="callout warn">
+        <strong>Known Bug: Cheat Name Conflict</strong>
+        The cheat codes <code>quick</code> and <code>quicklollypop</code> have a name collision — one is a prefix
+        of the other. The fix is to rename <code>quicklollypop</code>. See <a href="todo.html">Known Issues</a>.
+      </div>
+
+      <h2 id="implementation">Implementation Details</h2>
+      <p>The cheat system is implemented across:</p>
+      <ul>
+        <li><code>Tables.cpp</code> — stores the 22 cheat code strings as a static array <code>CheatCodes[22]</code></li>
+        <li><code>Game1.cpp</code> — <code>CheatAction(ButtonGlyph)</code> dispatches cheat button presses</li>
+        <li><code>Decor.cpp</code> — implements the actual cheat effects (spawning objects, granting items, etc.)</li>
+      </ul>
+      <p>The hidden button grid buttons (<code>Cheat11</code> through <code>Cheat32</code>) are present in <code>ButtonGlyph</code> but not rendered until the player deliberately navigates to the hidden area of the screen.</p>
+
+    </main>
+    <footer>
+      Mobile Eggbert is based on <em>Speedy Blupi</em> by Epsitec SA &amp; Daniel Roux.
+      C++ port by the OpenEggbert project. MIT License.
+    </footer>
+  </div>
+</div>
+
+</body>
+</html>

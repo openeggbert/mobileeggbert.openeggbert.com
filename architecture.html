@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Architecture — Mobile Eggbert</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topnav">
+  <a class="brand" href="index.html">🐣 Mobile Eggbert</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="history.html">History</a>
+    <a href="build.html">Build</a>
+    <a href="architecture.html" class="active">Architecture</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="api-enums.html">API Reference</a>
+    <a href="assets.html">Assets</a>
+    <a href="formats.html">Formats</a>
+    <a href="cheats.html">Cheats</a>
+    <a href="performance.html">Performance</a>
+  </nav>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h4>On This Page</h4>
+    <a href="#overview">Dependency Overview</a>
+    <a href="#layout">Source Layout</a>
+    <a href="#classes">Key Classes</a>
+    <a href="#game1">Game1 Loop</a>
+    <a href="#decor">Decor Class</a>
+    <a href="#tables">Tables System</a>
+    <a href="#interfaces">Interfaces</a>
+  </aside>
+
+  <div style="flex:1; min-width:0;">
+    <main>
+      <h1>Architecture</h1>
+      <p>Mobile Eggbert follows the XNA Game class model: a single <code>Game1</code> object owns all subsystems and drives the game loop via <code>Initialize / LoadContent / Update / Draw</code>.</p>
+
+      <h2 id="overview">Dependency Overview</h2>
+      <pre><code>WindowsPhoneSpeedyBlupi (this project)
+       │
+       ├── CNA  (/rv/data/development/github.com/openeggbert/cna)
+       │     │
+       │     └── SDL3, SDL3_image, SDL3_mixer
+       │
+       └── SharpRuntime  (/rv/data/development/github.com/openeggbert/sharp-runtime)
+             └── System.Math, System.String, List&lt;T&gt;, Dictionary, EventHandler, …</code></pre>
+
+      <div class="callout info">
+        <strong>SharpRuntime Dependency Rule</strong>
+        If a .NET BCL type is needed by this project or CNA, it must be added to SharpRuntime —
+        not worked around inline. Raw C++ types must never appear on the XNA API surface.
+        See <a href="https://github.com/openeggbert/sharp-runtime">sharp-runtime</a>.
+      </div>
+
+      <h2 id="layout">Source Layout</h2>
+      <pre><code>mobile-eggbert/
+├── include/WindowsPhoneSpeedyBlupi/    ← all .hpp headers
+│   ├── ConfigDef.hpp                   ← LEGACY vs MODERN mode selection
+│   ├── Config.hpp                      ← FPS, time/speed/resolution scaling
+│   ├── Decor.hpp                       ← core game simulation (player, world, AI)
+│   ├── Def.hpp                         ← global constants (LXIMAGE, MAXCELX, …)
+│   ├── Game1.hpp                       ← main XNA game class
+│   ├── GameData.hpp                    ← save data serialization
+│   ├── Helper.hpp                      ← string formatting utilities
+│   ├── IGame1.hpp                      ← interface for game instance
+│   ├── InputPad.hpp                    ← touch/keyboard/accelerometer input
+│   ├── IPixmap.hpp                     ← interface for sprite rendering
+│   ├── ISound.hpp                      ← interface for audio playback
+│   ├── Jauge.hpp                       ← HUD gauge widget
+│   ├── Misc.hpp                        ← geometry helpers
+│   ├── MyResource.hpp                  ← localized UI strings (FR/EN/DE)
+│   ├── Pixmap.hpp                      ← CNA/SpriteBatch sprite renderer
+│   ├── Slider.hpp                      ← UI slider widget
+│   ├── Sound.hpp                       ← CNA audio playback
+│   ├── Tables.hpp                      ← static animation/data tables
+│   ├── Text.hpp                        ← bitmap font renderer
+│   ├── TinyPoint.hpp                   ← 2D integer point
+│   ├── TinyRect.hpp                    ← 2D integer rectangle (L,R,T,B order!)
+│   ├── Worlds.hpp                      ← world file I/O
+│   ├── def/                            ← enumeration headers
+│   │   ├── BlupiAction.hpp             ← 88 player animation states
+│   │   ├── ContinueMission.hpp         ← checkpoint/resume states
+│   │   ├── Direction.hpp               ← None/Left/Right
+│   │   ├── GameSpeed.hpp               ← Slow/Normal/Fast/Faster/Fastest
+│   │   ├── KeyPressFlags.hpp           ← Jump/Fire/Down bitmask
+│   │   ├── PixmapChannel.hpp           ← 17 sprite-sheet channels
+│   │   ├── SecretPower.hpp             ← 5 active power-up states
+│   │   ├── SoundChannel.hpp            ← 93 sound effect slots
+│   │   └── Zoom.hpp                    ← 4 zoom levels (MODERN mode)
+│   └── decor/                          ← Decor-specific enum headers
+│       ├── DecorAction.hpp             ← camera-shake action types
+│       ├── DoorKeyFlags.hpp            ← 3-key bitmask
+│       └── ObjectType.hpp              ← 203+ moving object types
+└── src/WindowsPhoneSpeedyBlupi/        ← all .cpp implementations</code></pre>
+
+      <h2 id="classes">Key Classes</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Class</th><th>File</th><th>Role</th></tr></thead>
+          <tbody>
+            <tr><td><code>Game1</code></td><td>Game1.hpp/cpp</td><td>Top-level XNA game; phase state machine; owns all subsystems</td></tr>
+            <tr><td><code>Decor</code></td><td>Decor.hpp/cpp</td><td>Full gameplay simulation (~9400 lines): world, player, AI, physics, rendering</td></tr>
+            <tr><td><code>Pixmap</code></td><td>Pixmap.hpp/cpp</td><td>Sprite rendering via CNA SpriteBatch; manages 17 channels</td></tr>
+            <tr><td><code>Sound</code></td><td>Sound.hpp/cpp</td><td>Audio playback (volume/balance tables, 93 sound slots)</td></tr>
+            <tr><td><code>InputPad</code></td><td>InputPad.hpp/cpp</td><td>Touch, keyboard, and accelerometer input abstraction</td></tr>
+            <tr><td><code>GameData</code></td><td>GameData.hpp/cpp</td><td>Persistent save data (640-byte binary, 3 gamer slots)</td></tr>
+            <tr><td><code>Tables</code></td><td>Tables.hpp/cpp</td><td>Static animation table (2911 entries) + cheat code list</td></tr>
+            <tr><td><code>Worlds</code></td><td>Worlds.hpp/cpp</td><td>Level and save-game file I/O</td></tr>
+            <tr><td><code>Text</code></td><td>Text.hpp/cpp</td><td>Bitmap font renderer (32×32 px cells from text.png)</td></tr>
+            <tr><td><code>Jauge</code></td><td>Jauge.hpp/cpp</td><td>HUD gauge bar (health / lives display)</td></tr>
+            <tr><td><code>Slider</code></td><td>Slider.hpp/cpp</td><td>UI slider widget (settings screen)</td></tr>
+            <tr><td><code>MyResource</code></td><td>MyResource.hpp/cpp</td><td>Localized strings in French, English, German</td></tr>
+            <tr><td><code>TinyPoint</code></td><td>TinyPoint.hpp/cpp</td><td>2D integer point (x, y)</td></tr>
+            <tr><td><code>TinyRect</code></td><td>TinyRect.hpp/cpp</td><td>2D integer rectangle — <strong>non-standard field order: L, R, T, B</strong></td></tr>
+            <tr><td><code>Misc</code></td><td>Misc.hpp/cpp</td><td>Geometry helper functions</td></tr>
+            <tr><td><code>Helper</code></td><td>Helper.hpp/cpp</td><td>String formatting utilities</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout danger">
+        <strong>TinyRect Field Order Warning</strong>
+        <code>TinyRect</code> fields are in non-standard order: <code>Left, Right, Top, Bottom</code>
+        (not <code>Left, Top, Right, Bottom</code> as in most frameworks).
+        The constructor is <code>TinyRect(left, right, top, bottom)</code>. Passing arguments in the wrong order
+        causes silent geometry bugs.
+      </div>
+
+      <h2 id="game1">Game1 — XNA Game Loop</h2>
+      <p><code>Game1</code> inherits CNA's <code>Game</code> base class and follows the standard XNA lifecycle:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Method</th><th>Called</th><th>Responsibility</th></tr></thead>
+          <tbody>
+            <tr><td><code>Initialize()</code></td><td>Once at startup</td><td>Platform/window setup, subsystem creation</td></tr>
+            <tr><td><code>LoadContent()</code></td><td>After Initialize</td><td>Asset loading via CNA content pipeline</td></tr>
+            <tr><td><code>Update()</code></td><td>Every frame</td><td>Input polling, phase state machine, game logic</td></tr>
+            <tr><td><code>Draw()</code></td><td>Every frame</td><td>SpriteBatch rendering pass</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Game1 Subsystem Members</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Member</th><th>Type</th><th>Role</th></tr></thead>
+          <tbody>
+            <tr><td><code>graphics</code></td><td>GraphicsDeviceManager</td><td>Display/window management (from CNA)</td></tr>
+            <tr><td><code>pixmap</code></td><td><code>shared_ptr&lt;IPixmap&gt;</code></td><td>Sprite rendering</td></tr>
+            <tr><td><code>sound</code></td><td><code>shared_ptr&lt;ISound&gt;</code></td><td>Audio playback</td></tr>
+            <tr><td><code>decor</code></td><td>Decor</td><td>Gameplay simulation</td></tr>
+            <tr><td><code>inputPad</code></td><td>InputPad</td><td>Touch/keyboard/accelerometer input</td></tr>
+            <tr><td><code>gameData</code></td><td>GameData</td><td>Persistent save data</td></tr>
+            <tr><td><code>waitJauge</code></td><td>Jauge</td><td>Loading progress gauge (Wait phase)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="decor">Decor — Core Gameplay</h2>
+      <p><code>Decor.cpp</code> is the largest file (~9400+ lines). It contains the entire gameplay simulation and is responsible for:</p>
+      <ul>
+        <li>World grid management — two 100×100 arrays of <code>Cellule</code> structs</li>
+        <li>Player physics: walking, jumping, swimming, climbing bars</li>
+        <li>Vehicle logic: helicopter, jeep, tank, hovercraft, skateboard</li>
+        <li>Moving object AI: enemies, bombs, lifts, conveyors (up to 200 concurrent)</li>
+        <li>Collision detection against tile icons (<code>IsLave()</code>, <code>IsDeepWater()</code>, <code>IsDoor()</code>, …)</li>
+        <li>Camera scrolling and shake</li>
+        <li>Rendering: <code>Build()</code> draws tiles, <code>DrawInfo()</code> draws HUD</li>
+        <li>Level load/save delegation to <code>Worlds</code></li>
+        <li>Win/loss detection</li>
+      </ul>
+
+      <h3>World Grid Data Structures</h3>
+      <pre><code>struct Cellule {
+    short icon;  // sprite index into background/decor sheet
+};
+
+// Two 100×100 grids:
+Cellule m_decor[100][100];     // base tile layer (terrain, hazards)
+Cellule m_bigDecor[100][100];  // secondary decorative layer</code></pre>
+
+      <h3>Moving Objects</h3>
+      <pre><code>// Up to 200 concurrent moving objects
+struct MoveObject {
+    ObjectType type;       // what kind of object
+    short      stepAdvance;
+    short      stepRecede;
+    short      timeStopStart;
+    short      timeStopEnd;
+    TinyPoint  posStart;   // starting position (tile coords)
+    TinyPoint  posEnd;     // target/end position
+    TinyPoint  posCurrent; // current position
+    short      step;       // current animation step
+    short      time;       // timer
+    short      phase;      // current motion phase
+    short      channel;    // sprite channel
+    short      icon;       // sprite icon index
+};</code></pre>
+
+      <h2 id="tables">Tables System</h2>
+      <p><code>Tables.cpp</code> contains a <strong>2911-element static animation table</strong> that maps each <code>(BlupiAction, phase)</code> pair to a <code>(channel, icon, nextPhase)</code> tuple. This drives all character animation without per-action if/else logic in <code>Decor.cpp</code>.</p>
+      <p>The table also contains the list of 22 cheat code strings used by <code>Game1::CheatAction()</code>.</p>
+
+      <h2 id="interfaces">Interfaces</h2>
+      <p>Pixmap and Sound are accessed through abstract interfaces, allowing platform-specific or test implementations:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Interface</th><th>Concrete Implementation</th></tr></thead>
+          <tbody>
+            <tr><td><code>IPixmap</code></td><td><code>Pixmap</code> (CNA SpriteBatch renderer)</td></tr>
+            <tr><td><code>ISound</code></td><td><code>Sound</code> (CNA audio via SDL3_mixer)</td></tr>
+            <tr><td><code>IGame1</code></td><td><code>Game1</code> (main game instance)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </main>
+    <footer>
+      Mobile Eggbert is based on <em>Speedy Blupi</em> by Epsitec SA &amp; Daniel Roux.
+      C++ port by the OpenEggbert project. MIT License.
+    </footer>
+  </div>
+</div>
+
+</body>
+</html>

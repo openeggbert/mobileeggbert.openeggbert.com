@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Formats — Mobile Eggbert</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topnav">
+  <a class="brand" href="index.html">🐣 Mobile Eggbert</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="history.html">History</a>
+    <a href="build.html">Build</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="api-enums.html">API Reference</a>
+    <a href="assets.html">Assets</a>
+    <a href="formats.html" class="active">Formats</a>
+    <a href="cheats.html">Cheats</a>
+    <a href="performance.html">Performance</a>
+  </nav>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h4>On This Page</h4>
+    <a href="#savedata">Save Data Format</a>
+    <a href="#worldfile">World File Format</a>
+    <a href="#worldnums">Level Numbering</a>
+    <a href="#descfile">DescFile Metadata</a>
+  </aside>
+
+  <div style="flex:1; min-width:0;">
+    <main>
+      <h1>Data Formats</h1>
+      <p>Mobile Eggbert uses two custom file formats: a binary save data file and text-based world (level) files.</p>
+
+      <!-- SAVE DATA -->
+      <h2 id="savedata">Save Data Format</h2>
+      <p>Managed by <code>GameData</code>. A flat <strong>640-byte binary array</strong> written to the platform's persistent storage (IndexedDB on web, file system on desktop/Android).</p>
+
+      <h3>Binary Layout</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Offset</th><th>Size</th><th>Content</th></tr></thead>
+        <tbody>
+          <tr><td>0–9</td><td>10 bytes</td><td>Header: version, selected gamer index, global settings (sound on/off, jump mode, zoom level, accelerometer on/off)</td></tr>
+          <tr><td>10–219</td><td>210 bytes</td><td>Gamer slot A: lives remaining, last world reached, 200-byte door state array</td></tr>
+          <tr><td>220–429</td><td>210 bytes</td><td>Gamer slot B (same structure)</td></tr>
+          <tr><td>430–639</td><td>210 bytes</td><td>Gamer slot C (same structure)</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Gamer Slot Layout (210 bytes)</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Offset within slot</th><th>Size</th><th>Content</th></tr></thead>
+        <tbody>
+          <tr><td>0</td><td>1 byte</td><td>Number of lives remaining</td></tr>
+          <tr><td>1</td><td>1 byte</td><td>Last world number reached</td></tr>
+          <tr><td>2–201</td><td>200 bytes</td><td>Door state array — one byte per door, 0=locked, 1=opened</td></tr>
+          <tr><td>202–209</td><td>8 bytes</td><td>Padding / reserved</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Serialization</h3>
+      <p>Written and read via <code>Worlds::ReadGameData()</code> / <code>Worlds::WriteGameData()</code>. Key accessors:</p>
+      <ul>
+        <li><code>getSelectedGamerProperty()</code> / <code>setSelectedGamerProperty(int)</code></li>
+        <li><code>getNbViesProperty()</code> / <code>setNbViesProperty(int)</code></li>
+        <li><code>getLastWorldProperty()</code> / <code>setLastWorldProperty(int)</code></li>
+      </ul>
+
+      <!-- WORLD FILE -->
+      <h2 id="worldfile">World File Format</h2>
+      <p>Levels are stored as <strong>line-delimited text files</strong> in <code>worlds/worldNNN.txt</code>. Each file describes a 100×100 tile grid plus metadata.</p>
+
+      <h3>File Structure</h3>
+      <pre><code># Line 1: metadata (DescFile fields as name=value pairs)
+posDecor=x;y dimDecor=w;h world=N music=M region=R blupiPos=x;y blupiDir=d name=LevelName
+
+# Following lines: Decor section (base tile layer)
+# 100 lines, each with 100 comma-separated icon indices
+icon0,icon1,...,icon99
+...
+
+# BigDecor section (secondary decorative layer)
+# Same format as Decor section
+
+# Doors section (door state array)
+# Only non-default (non-1) values are written; format is compact</code></pre>
+
+      <h3>Field Value Formats</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Type</th><th>Format</th><th>Example</th></tr></thead>
+        <tbody>
+          <tr><td>int</td><td>Plain integer</td><td><code>world=5</code></td></tr>
+          <tr><td>double</td><td>Trailing <code>.0</code></td><td><code>time=30.0</code></td></tr>
+          <tr><td>bool</td><td><code>True</code> or <code>False</code></td><td><code>rain=False</code></td></tr>
+          <tr><td>TinyPoint</td><td><code>x;y</code></td><td><code>blupiPos=3;7</code></td></tr>
+          <tr><td>array</td><td>comma-separated</td><td><code>1,2,3,4,…</code></td></tr>
+        </tbody>
+      </table></div>
+
+      <h2 id="worldnums">Level Numbering Scheme</h2>
+      <div class="table-wrap"><table>
+        <thead><tr><th>File range</th><th>Content</th></tr></thead>
+        <tbody>
+          <tr><td><code>world001.txt</code></td><td>Tutorial level</td></tr>
+          <tr><td><code>world010–world019</code></td><td>Chapter 1 (levels 0–9)</td></tr>
+          <tr><td><code>world020–world029</code></td><td>Chapter 2</td></tr>
+          <tr><td><code>world030–world039</code></td><td>Chapter 3</td></tr>
+          <tr><td>… (pattern continues) …</td><td>Chapters 4–9</td></tr>
+          <tr><td><code>world090–world099</code></td><td>Chapter 9</td></tr>
+          <tr><td><code>world100–world199</code></td><td>Chapters 10–19</td></tr>
+          <tr><td><code>world199.txt</code></td><td>Final bonus level</td></tr>
+        </tbody>
+      </table></div>
+
+      <h2 id="descfile">DescFile Metadata Fields</h2>
+      <p>The metadata line on line 1 of each world file uses the following named fields:</p>
+
+      <div class="table-wrap"><table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>posDecor</code></td><td>TinyPoint</td><td>Initial scroll position (tile coords)</td></tr>
+          <tr><td><code>dimDecor</code></td><td>TinyPoint</td><td>Dimensions of the active world area (tiles)</td></tr>
+          <tr><td><code>world</code></td><td>int</td><td>World/level number</td></tr>
+          <tr><td><code>music</code></td><td>int</td><td>Background music track index</td></tr>
+          <tr><td><code>region</code></td><td>int</td><td>Region/chapter number</td></tr>
+          <tr><td><code>blupiPos</code></td><td>TinyPoint</td><td>Player starting position (tile coords)</td></tr>
+          <tr><td><code>blupiDir</code></td><td>int</td><td>Player starting direction (1=Left, 2=Right)</td></tr>
+          <tr><td><code>name</code></td><td>string</td><td>Level display name (used in ranking screen)</td></tr>
+        </tbody>
+      </table></div>
+
+      <div class="callout info">
+        <strong>Doors Section Compression</strong>
+        The Doors section in world files uses a sparse format: only non-default values are written.
+        The default door state is 1 (open/traversable), so a completely untouched door array would produce
+        an empty Doors section. This keeps level files compact.
+      </div>
+
+    </main>
+    <footer>
+      Mobile Eggbert is based on <em>Speedy Blupi</em> by Epsitec SA &amp; Daniel Roux.
+      C++ port by the OpenEggbert project. MIT License.
+    </footer>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Build System — Mobile Eggbert</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topnav">
+  <a class="brand" href="index.html">🐣 Mobile Eggbert</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="history.html">History</a>
+    <a href="build.html" class="active">Build</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="api-enums.html">API Reference</a>
+    <a href="assets.html">Assets</a>
+    <a href="formats.html">Formats</a>
+    <a href="cheats.html">Cheats</a>
+    <a href="performance.html">Performance</a>
+  </nav>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h4>On This Page</h4>
+    <a href="#prerequisites">Prerequisites</a>
+    <a href="#submodules">Submodules</a>
+    <a href="#linux">Linux</a>
+    <a href="#backends">Rendering Backends</a>
+    <a href="#web">Web / Emscripten</a>
+    <a href="#android">Android</a>
+    <a href="#windows">Windows (MinGW)</a>
+    <a href="#assets">Asset Layout</a>
+    <a href="#deps">Runtime Dependencies</a>
+  </aside>
+
+  <div style="flex:1; min-width:0;">
+    <main>
+      <h1>Build System</h1>
+      <p>Mobile Eggbert uses <strong>CMake 3.21+</strong> as its build system. All four target platforms share the same CMakeLists.txt; platform-specific behaviour is enabled through CMake flags.</p>
+
+      <h2 id="prerequisites">Prerequisites</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Tool</th><th>Purpose</th><th>Minimum Version</th></tr></thead>
+          <tbody>
+            <tr><td>CMake</td><td>Build system generator</td><td>3.21</td></tr>
+            <tr><td>GCC or Clang</td><td>C++23 compiler (Linux/macOS)</td><td>GCC 13 / Clang 16</td></tr>
+            <tr><td>MinGW-w64</td><td>Windows cross-compilation from Linux</td><td>x86_64-w64-mingw32</td></tr>
+            <tr><td>Emscripten SDK</td><td>WebAssembly build</td><td>3.1+</td></tr>
+            <tr><td>Android NDK</td><td>Android native build</td><td>28.2.13676358</td></tr>
+            <tr><td>Gradle</td><td>Android APK packaging</td><td>8.4+</td></tr>
+            <tr><td>SDL3</td><td>Window, input, rendering (via CNA)</td><td>3.x</td></tr>
+            <tr><td>SDL3_image</td><td>PNG loading (via CNA)</td><td>3.x</td></tr>
+            <tr><td>SDL3_mixer</td><td>Audio mixing (via CNA)</td><td>3.x</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="submodules">Initialize Submodules</h2>
+      <p>CNA and SharpRuntime are Git submodules. Run this once after cloning:</p>
+      <pre><code>git submodule update --init --recursive</code></pre>
+
+      <h2 id="linux">Linux Build</h2>
+      <p>The recommended development target. Uses the EasyGL (OpenGL) backend by default.</p>
+      <pre><code># Configure
+cmake -S . -B cmake-build-debug \
+  -DCMAKE_BUILD_TYPE=Debug
+
+# Build
+cmake --build cmake-build-debug --target WindowsPhoneSpeedyBlupi
+
+# Run
+./cmake-build-debug/WindowsPhoneSpeedyBlupi</code></pre>
+
+      <p>To explicitly choose the SDL_Renderer backend:</p>
+      <pre><code>cmake -S . -B build-linux \
+  -DCNA_BACKEND_SDL_RENDERER=ON \
+  -DCNA_BACKEND_EASY_GL=OFF \
+  -DCNA_BACKEND_BGFX=OFF
+cmake --build build-linux --target WindowsPhoneSpeedyBlupi</code></pre>
+
+      <h2 id="backends">Rendering Backends</h2>
+      <p>Exactly one rendering backend must be active at build time. Set via CMake flags:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>CMake Flag</th><th>Backend</th><th>Recommended For</th></tr></thead>
+          <tbody>
+            <tr><td>CNA_BACKEND_EASY_GL=ON</td><td>easy-gl (lightweight OpenGL)</td><td>Desktop (default)</td></tr>
+            <tr><td>CNA_BACKEND_SDL_RENDERER=ON</td><td>SDL_Renderer</td><td>Emscripten, Android, compatibility</td></tr>
+            <tr><td>CNA_BACKEND_BGFX=ON</td><td>bgfx (multi-API)</td><td>Desktop, multi-GPU</td></tr>
+            <tr><td><em>Vulkan</em></td><td>Vulkan</td><td>Desktop high-performance build</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout info">
+        <strong>Default Desktop Backend</strong>
+        The current default for desktop builds is <strong>EasyGL</strong>. If you want the Vulkan build, use
+        the <code>cmake-build-vulkan</code> preset.
+      </div>
+
+      <h2 id="web">Web / Emscripten Build</h2>
+      <p>Produces a <code>.html</code> + <code>.wasm</code> + <code>.js</code> bundle that runs in any modern browser.</p>
+
+      <pre><code># Activate Emscripten SDK (adjust path)
+source /path/to/emsdk/emsdk_env.sh
+
+# Configure with Emscripten cmake wrapper
+emcmake cmake -S . -B cmake-build-web -DCMAKE_BUILD_TYPE=Debug
+
+# Build
+cmake --build cmake-build-web
+
+# Run in browser (starts a local HTTP server)
+emrun cmake-build-web/WindowsPhoneSpeedyBlupi.html</code></pre>
+
+      <h3>Emscripten-specific Settings</h3>
+      <p>These flags are automatically set by <code>CMakeLists.txt</code> when building for Emscripten:</p>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Linker Flag</th><th>Value</th><th>Effect</th></tr></thead>
+          <tbody>
+            <tr><td>ALLOW_MEMORY_GROWTH</td><td>1</td><td>Heap can grow dynamically at runtime</td></tr>
+            <tr><td>INITIAL_MEMORY</td><td>134 MB</td><td>Starting heap allocation</td></tr>
+            <tr><td>--preload-file Content</td><td>—</td><td>Game assets embedded in .data file</td></tr>
+            <tr><td>--preload-file worlds</td><td>—</td><td>Level files embedded</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p>Virtual filesystem mount points accessible from C++ code:</p>
+      <ul>
+        <li><code>/Content/backgrounds/</code> — level backgrounds</li>
+        <li><code>/Content/icons/</code> — sprite sheets</li>
+        <li><code>/Content/sounds/</code> — WAV files</li>
+        <li><code>/worlds/</code> — level text files</li>
+      </ul>
+
+      <div class="callout warn">
+        <strong>Web Sound Delay</strong>
+        The Emscripten build has a known audio startup delay on first sound playback. This is a known issue
+        under investigation. See <a href="todo.html">Known Issues</a>.
+      </div>
+
+      <h2 id="android">Android Build</h2>
+      <p>The <code>android/</code> directory contains a Gradle project that wraps the native build.</p>
+
+      <pre><code>cd android
+./gradlew assembleDebug
+
+# Install to connected device or emulator
+adb install app/build/outputs/apk/debug/app-debug.apk
+
+# Launch
+adb shell am start -n org.openeggbert.speedyblupi/.SpeedyBlupiActivity</code></pre>
+
+      <h3>Android Configuration</h3>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Setting</th><th>Value</th></tr></thead>
+          <tbody>
+            <tr><td>NDK version</td><td>28.2.13676358</td></tr>
+            <tr><td>Target API level</td><td>35 (Android 15)</td></tr>
+            <tr><td>Asset access</td><td>AAssetManager (assets packaged in APK)</td></tr>
+            <tr><td>Rendering backend</td><td>SDL_Renderer (auto-selected for Android)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="windows">Windows Build (Cross-compile from Linux)</h2>
+      <p>Uses MinGW-w64 to produce a native Windows x86_64 executable. See <code>WINDOWS.md</code> in the repo root for full details.</p>
+
+      <pre><code>cmake -S . -B cmake-build-win \
+  -DCMAKE_TOOLCHAIN_FILE=cmake/mingw-toolchain.cmake \
+  -DCMAKE_BUILD_TYPE=Release
+cmake --build cmake-build-win --target WindowsPhoneSpeedyBlupi</code></pre>
+
+      <p>The C++ runtime can be linked either dynamically (default) or statically via <code>-static-libgcc -static-libstdc++</code>.</p>
+
+      <h2 id="assets">Asset Layout per Platform</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Platform</th><th>Content location</th><th>How accessed</th></tr></thead>
+          <tbody>
+            <tr><td>Linux / Windows</td><td><code>Content/</code> copied next to executable</td><td>Standard file I/O</td></tr>
+            <tr><td>Emscripten</td><td>Preloaded into virtual FS at link time</td><td><code>/Content/</code> virtual path</td></tr>
+            <tr><td>Android</td><td>Packaged as APK assets</td><td>AAssetManager API</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="deps">Runtime DLLs (Windows only)</h2>
+      <p>The following DLLs must be present alongside the executable on Windows (CMake copies them automatically):</p>
+      <ul>
+        <li><code>SDL3.dll</code></li>
+        <li><code>SDL3_image.dll</code></li>
+        <li><code>SDL3_mixer.dll</code></li>
+        <li><code>libwinpthread-1.dll</code></li>
+      </ul>
+      <p>Alternatively, link statically with <code>-static-libgcc -static-libstdc++</code> to avoid the libwinpthread dependency.</p>
+
+    </main>
+    <footer>
+      Mobile Eggbert is based on <em>Speedy Blupi</em> by Epsitec SA &amp; Daniel Roux.
+      C++ port by the OpenEggbert project. MIT License.
+    </footer>
+  </div>
+</div>
+
+</body>
+</html>

@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Performance — Mobile Eggbert</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topnav">
+  <a class="brand" href="index.html">🐣 Mobile Eggbert</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="history.html">History</a>
+    <a href="build.html">Build</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="api-enums.html">API Reference</a>
+    <a href="assets.html">Assets</a>
+    <a href="formats.html">Formats</a>
+    <a href="cheats.html">Cheats</a>
+    <a href="performance.html" class="active">Performance</a>
+  </nav>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h4>On This Page</h4>
+    <a href="#analysis">Performance Analysis</a>
+    <a href="#issue1">Issue 1: ByeByeDraw</a>
+    <a href="#issue2">Issue 2: ByeByeAdd</a>
+    <a href="#issue3">Issue 3: ByeByeStep</a>
+    <a href="#issue4">Issue 4: MoveObjectSort</a>
+    <a href="#heapalloc">Heap Allocation</a>
+  </aside>
+
+  <div style="flex:1; min-width:0;">
+    <main>
+      <h1>Performance Notes</h1>
+      <p>Four performance issues were identified and documented in <code>RAM.md</code>. All are located in <code>src/WindowsPhoneSpeedyBlupi/Decor.cpp</code>. None are blocking — the game runs correctly — but they represent unnecessary CPU overhead per frame.</p>
+
+      <h2 id="analysis">Performance Analysis Source</h2>
+      <p>The analysis is documented in <code>RAM.md</code> at the repository root. All four issues are in <code>Decor.cpp</code> in the <code>ByeByeObject</code> particle system and the <code>MoveObject</code> sort routine.</p>
+
+      <div class="callout info">
+        <strong>No Heap Allocation Issues Found</strong>
+        The analysis confirmed that <code>make_shared</code> / <code>make_unique</code> calls are all one-time
+        initialization (LoadContent, constructors). There are no per-frame allocations.
+      </div>
+
+      <!-- ISSUE 1 -->
+      <h2 id="issue1">Issue 1 — ByeByeDraw (<code>Decor.cpp:9252</code>)</h2>
+      <p><strong>Severity:</strong> Low — copies a 72-byte struct every iteration of the per-frame draw loop.</p>
+
+      <pre><code>// Current — copies 72-byte ByeByeObject struct each iteration:
+for (ByeByeObject obj : m_byeByeObjects) {
+    DrawByeByeObject(obj);
+}
+
+// Fix — use const reference:
+for (const ByeByeObject&amp; obj : m_byeByeObjects) {
+    DrawByeByeObject(obj);
+}</code></pre>
+
+      <!-- ISSUE 2 -->
+      <h2 id="issue2">Issue 2 — ByeByeAdd (<code>Decor.cpp:9187–9206</code>)</h2>
+      <p><strong>Severity:</strong> Low — double-copy before vector insertion (construct on stack, then copy into vector).</p>
+
+      <pre><code>// Current — constructs on stack then copies:
+ByeByeObject obj;
+obj.x = x;
+obj.y = y;
+obj.icon = icon;
+// ... more fields ...
+m_byeByeObjects.push_back(obj);  // copy
+
+// Fix — use emplace_back with direct field initialization:
+m_byeByeObjects.emplace_back(x, y, icon, ...);</code></pre>
+
+      <!-- ISSUE 3 -->
+      <h2 id="issue3">Issue 3 — ByeByeStep (<code>Decor.cpp:9241</code>)</h2>
+      <p><strong>Severity:</strong> Medium — <code>vector::erase()</code> called in the middle of a vector during iteration is O(n) per removal. With many short-lived particles, this becomes O(n²).</p>
+
+      <pre><code>// Current — O(n) erase during iteration:
+for (auto it = m_byeByeObjects.begin(); it != m_byeByeObjects.end(); ) {
+    it-&gt;time--;
+    if (it-&gt;time &lt;= 0) {
+        it = m_byeByeObjects.erase(it);  // O(n) shift
+    } else {
+        ++it;
+    }
+}
+
+// Fix — erase-remove idiom (single O(n) pass):
+for (auto&amp; obj : m_byeByeObjects) obj.time--;
+m_byeByeObjects.erase(
+    std::remove_if(m_byeByeObjects.begin(), m_byeByeObjects.end(),
+                   [](const ByeByeObject&amp; o){ return o.time &lt;= 0; }),
+    m_byeByeObjects.end()
+);</code></pre>
+
+      <!-- ISSUE 4 -->
+      <h2 id="issue4">Issue 4 — MoveObjectSort (<code>Decor.cpp:9074–9108</code>)</h2>
+      <p><strong>Severity:</strong> Medium — manual bubble sort with manual struct copying for the <code>MoveObject</code> array. This is O(n²) with a very large constant factor (each swap copies the whole struct).</p>
+
+      <pre><code>// Current — manual bubble sort:
+for (int i = 0; i &lt; m_moveObjectCount - 1; i++) {
+    for (int j = i + 1; j &lt; m_moveObjectCount; j++) {
+        if (m_moveObject[i].z &gt; m_moveObject[j].z) {
+            MoveObject temp = m_moveObject[i];   // full struct copy
+            m_moveObject[i] = m_moveObject[j];
+            m_moveObject[j] = temp;
+        }
+    }
+}
+
+// Fix — std::sort with lambda comparator:
+std::sort(m_moveObject, m_moveObject + m_moveObjectCount,
+          [](const MoveObject&amp; a, const MoveObject&amp; b){
+              return a.z &lt; b.z;
+          });</code></pre>
+
+      <h2 id="heapalloc">Heap Allocation Status</h2>
+      <p>The analysis scanned for per-frame heap allocations and found none. All <code>make_shared</code> and <code>make_unique</code> calls are in one-time initialization paths:</p>
+      <ul>
+        <li><code>Game1::LoadContent()</code> — creates <code>Pixmap</code> and <code>Sound</code> instances once</li>
+        <li><code>Game1::Initialize()</code> — other one-time allocations</li>
+        <li>Constructors — class member initialization</li>
+      </ul>
+      <p>No heap allocations were found in <code>Update()</code> or <code>Draw()</code> hot paths.</p>
+
+    </main>
+    <footer>
+      Mobile Eggbert is based on <em>Speedy Blupi</em> by Epsitec SA &amp; Daniel Roux.
+      C++ port by the OpenEggbert project. MIT License.
+    </footer>
+  </div>
+</div>
+
+</body>
+</html>

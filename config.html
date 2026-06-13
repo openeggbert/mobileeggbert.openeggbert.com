@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Configuration — Mobile Eggbert</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topnav">
+  <a class="brand" href="index.html">🐣 Mobile Eggbert</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="history.html">History</a>
+    <a href="build.html">Build</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="api-enums.html">API Reference</a>
+    <a href="assets.html">Assets</a>
+    <a href="formats.html">Formats</a>
+    <a href="cheats.html">Cheats</a>
+    <a href="performance.html">Performance</a>
+  </nav>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h4>On This Page</h4>
+    <a href="#modes">LEGACY vs MODERN</a>
+    <a href="#fps">FPS Settings</a>
+    <a href="#scaling">Time &amp; Speed Scaling</a>
+    <a href="#resolution">Resolution Scaling</a>
+    <a href="#files">Config Files</a>
+    <a href="#constants">Game Constants</a>
+  </aside>
+
+  <div style="flex:1; min-width:0;">
+    <main>
+      <h1>Compile-Time Configuration</h1>
+      <p>All configuration lives in two header files that are set at <em>compile time</em>. Runtime settings (sound on/off, zoom, accelerometer) are handled separately by <code>GameData</code>.</p>
+
+      <h2 id="files">Configuration Files</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>File</th><th>Role</th></tr></thead>
+          <tbody>
+            <tr><td><code>include/WindowsPhoneSpeedyBlupi/ConfigDef.hpp</code></td><td>Defines <code>LEGACY_MODE</code> or <code>MODERN_MODE</code> macro — exactly one must be active</td></tr>
+            <tr><td><code>include/WindowsPhoneSpeedyBlupi/Config.hpp</code></td><td>FPS value, TIME_SCALE, SPEED_SCALE, resolution scale enum — derived from ConfigDef</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout warn">
+        <strong>Global Impact</strong>
+        Changes to <code>Config.hpp</code> affect timing, resolution, and feature flags across the <em>entire</em> project.
+        Never mix LEGACY and MODERN headers in a single build.
+      </div>
+
+      <h2 id="modes">Two Operating Modes</h2>
+      <p>Exactly one mode is active at compile time. The mode is selected by defining a macro in <code>ConfigDef.hpp</code>.</p>
+
+      <div class="grid-2">
+        <div style="background:var(--bg2); border:1px solid var(--border); border-radius:var(--radius); padding:20px;">
+          <h3 style="margin-top:0; color:var(--text-muted)">LEGACY Mode</h3>
+          <p style="font-size:13px; color:var(--text-muted); margin-bottom:14px;">Faithfully reproduces original Windows Phone behaviour.</p>
+          <ul style="font-size:13.5px;">
+            <li>FPS: locked at <strong>20</strong></li>
+            <li><code>TIME_SCALE = 1.0</code></li>
+            <li><code>SPEED_SCALE = 1.0</code></li>
+            <li>Touch buttons always visible</li>
+            <li>No resolution scaling</li>
+          </ul>
+        </div>
+        <div style="background:var(--bg2); border:1px solid var(--accent); border-radius:var(--radius); padding:20px;">
+          <h3 style="margin-top:0; color:var(--accent)">MODERN Mode <small style="font-size:12px; color:var(--text-muted)">(default)</small></h3>
+          <p style="font-size:13px; color:var(--text-muted); margin-bottom:14px;">Experimental extended mode with higher FPS support.</p>
+          <ul style="font-size:13.5px;">
+            <li>Configurable FPS: 20, 30, 60, 90, 120, 144</li>
+            <li><code>TIME_SCALE = FPS / 20</code></li>
+            <li><code>SPEED_SCALE = 20 / FPS</code></li>
+            <li>Touch buttons hidden on non-touch platforms</li>
+            <li>Resolution scaling helpers available</li>
+          </ul>
+        </div>
+      </div>
+
+      <h2 id="fps">FPS Settings (MODERN mode)</h2>
+      <p>The target FPS is set in <code>Config.hpp</code>. The game logic was originally designed for 20 FPS; the scaling factors adjust physics and animation timing automatically.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>FPS</th><th>TIME_SCALE</th><th>SPEED_SCALE</th><th>Notes</th></tr></thead>
+          <tbody>
+            <tr><td>20</td><td>1.0</td><td>1.0</td><td>Original speed (same as LEGACY)</td></tr>
+            <tr><td>30</td><td>1.5</td><td>0.667</td><td>Smooth on older hardware</td></tr>
+            <tr><td>60</td><td>3.0</td><td>0.333</td><td>Standard modern target</td></tr>
+            <tr><td>90</td><td>4.5</td><td>0.222</td><td>High-refresh monitors</td></tr>
+            <tr><td>120</td><td>6.0</td><td>0.167</td><td>120 Hz displays</td></tr>
+            <tr><td>144</td><td>7.2</td><td>0.139</td><td>144 Hz gaming monitors</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="scaling">Scaling Helper Functions</h2>
+      <p>Three inline helpers in <code>Config.hpp</code> are used throughout the codebase to adapt timing values:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Function</th><th>Formula</th><th>Use Case</th></tr></thead>
+          <tbody>
+            <tr><td><code>ScaleTime(t)</code></td><td><code>t × TIME_SCALE</code></td><td>Multiply a tick count to stay proportional at higher FPS</td></tr>
+            <tr><td><code>ScaleDiv(t)</code></td><td><code>t × SPEED_SCALE</code></td><td>Divide a speed value so objects don't move faster at higher FPS</td></tr>
+            <tr><td><code>ScaleAsset(path)</code></td><td>Inserts <code>4x</code> suffix</td><td>Returns path to high-DPI asset when resolution scale is 4×</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h2 id="resolution">Resolution Scaling (MODERN mode, experimental)</h2>
+      <p>The <code>Zoom</code> enum controls the render resolution. Larger scales require the corresponding <code>4x</code> asset directories.</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Enum Value</th><th>Scale</th><th>Resolution</th><th>Asset directories</th></tr></thead>
+          <tbody>
+            <tr><td><code>ScaleResolution1</code></td><td>1×</td><td>640×480</td><td><code>icons/</code>, <code>backgrounds/</code></td></tr>
+            <tr><td><code>ScaleResolution2</code></td><td>2×</td><td>1280×960</td><td><em>future</em></td></tr>
+            <tr><td><code>ScaleResolution4</code></td><td>4×</td><td>2560×1920</td><td><code>icons4x/</code>, <code>backgrounds4x/</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="callout info">
+        <strong>High-DPI Assets Exist</strong>
+        Both <code>Content/backgrounds4x/</code> (35 files) and <code>Content/icons4x/</code> (8 files) are already
+        present in the repository. The 4× resolution mode is functional but experimental.
+      </div>
+
+      <h2 id="constants">Key Game Constants</h2>
+      <p>Defined in <code>include/WindowsPhoneSpeedyBlupi/Def.hpp</code>. These are fixed regardless of mode:</p>
+
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Constant</th><th>Value</th><th>Description</th></tr></thead>
+          <tbody>
+            <tr><td><code>LXIMAGE</code></td><td>640</td><td>Game viewport width in pixels</td></tr>
+            <tr><td><code>LYIMAGE</code></td><td>480</td><td>Game viewport height in pixels</td></tr>
+            <tr><td><code>MAXCELX</code></td><td>100</td><td>Maximum tile columns per world</td></tr>
+            <tr><td><code>MAXCELY</code></td><td>100</td><td>Maximum tile rows per world</td></tr>
+            <tr><td><code>DIMOBJX</code></td><td>64</td><td>Object sprite width in pixels</td></tr>
+            <tr><td><code>DIMOBJY</code></td><td>64</td><td>Object sprite height in pixels</td></tr>
+            <tr><td><code>DIMBLUPIX</code></td><td>60</td><td>Player sprite width in pixels</td></tr>
+            <tr><td><code>DIMBLUPIY</code></td><td>60</td><td>Player sprite height in pixels</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3>Coordinate Systems</h3>
+      <ul>
+        <li><strong>Tile coordinates:</strong> integer grid <code>[0, 100) × [0, 100)</code></li>
+        <li><strong>Game-space pixels:</strong> <code>tile_index × DIMOBJX/DIMOBJY</code> (64 pixels per tile)</li>
+        <li><strong>Screen-space:</strong> game-space + scroll offset, managed by <code>Pixmap</code> via CNA SpriteBatch</li>
+      </ul>
+
+    </main>
+    <footer>
+      Mobile Eggbert is based on <em>Speedy Blupi</em> by Epsitec SA &amp; Daniel Roux.
+      C++ port by the OpenEggbert project. MIT License.
+    </footer>
+  </div>
+</div>
+
+</body>
+</html>

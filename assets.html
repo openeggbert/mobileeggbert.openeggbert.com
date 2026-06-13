@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Asset Files — Mobile Eggbert</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topnav">
+  <a class="brand" href="index.html">🐣 Mobile Eggbert</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="history.html">History</a>
+    <a href="build.html">Build</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="api-enums.html">API Reference</a>
+    <a href="assets.html" class="active">Assets</a>
+    <a href="formats.html">Formats</a>
+    <a href="cheats.html">Cheats</a>
+    <a href="performance.html">Performance</a>
+  </nav>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h4>On This Page</h4>
+    <a href="#backgrounds">Backgrounds</a>
+    <a href="#icons">Icon Sprite Sheets</a>
+    <a href="#sounds">Sound Effects</a>
+    <a href="#worlds">Level Files</a>
+    <a href="#highdpi">High-DPI (4×)</a>
+    <a href="#manifest">Content Manifest</a>
+  </aside>
+
+  <div style="flex:1; min-width:0;">
+    <main>
+      <h1>Asset Files</h1>
+      <p>All game assets live in <code>Content/</code> (PNG sprites + WAV sounds) and <code>worlds/</code> (level text files). The directory structure is consistent across platforms — only the access method differs.</p>
+
+      <!-- BACKGROUNDS -->
+      <h2 id="backgrounds">Content/backgrounds/ — Background Images</h2>
+      <p>37 PNG files. 32 are level terrain backgrounds; the rest are UI screens.</p>
+
+      <h3>Level Backgrounds (32 themes)</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>File</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>decor000.png</code></td><td>Ice / cavern theme</td></tr>
+          <tr><td><code>decor001.png</code></td><td>Forest / jungle theme</td></tr>
+          <tr><td><code>decor002.png</code></td><td>Desert theme</td></tr>
+          <tr><td><code>decor003.png</code></td><td>City / urban theme</td></tr>
+          <tr><td><code>decor004.png</code></td><td>Space theme</td></tr>
+          <tr><td><code>decor006.png</code> – <code>decor031.png</code></td><td>Additional themes (some IDs skipped)</td></tr>
+        </tbody>
+      </table></div>
+
+      <p>The level background to load for each level is specified by the <code>region</code> field in the world file metadata.</p>
+
+      <h3>UI Screen Backgrounds</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>File</th><th>PixmapChannel</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>speedyblupi.png</code></td><td>SpeedyBlupiBackground (15)</td><td>Speedy Blupi title/splash screen</td></tr>
+          <tr><td><code>blupiyoupie.png</code></td><td>BlupiYoupieBackground (16)</td><td>Blupi Youpie title screen variant</td></tr>
+          <tr><td><code>init.png</code></td><td>—</td><td>Main menu / gamer select background</td></tr>
+          <tr><td><code>gear.png</code></td><td>GearBackground (17)</td><td>Settings screen background</td></tr>
+          <tr><td><code>pause.png</code></td><td>—</td><td>Pause screen overlay</td></tr>
+          <tr><td><code>lost.png</code></td><td>—</td><td>Level failure screen</td></tr>
+          <tr><td><code>win.png</code></td><td>—</td><td>Level completion screen</td></tr>
+          <tr><td><code>trial.png</code></td><td>—</td><td>Trial / paywall screen</td></tr>
+          <tr><td><code>wait.png</code></td><td>—</td><td>Loading screen</td></tr>
+          <tr><td><code>setup.png</code></td><td>—</td><td>Settings background</td></tr>
+        </tbody>
+      </table></div>
+
+      <!-- ICONS -->
+      <h2 id="icons">Content/icons/ — Sprite Sheets</h2>
+      <p>8 PNG sprite sheets. Each is accessed through its corresponding <code>PixmapChannel</code>.</p>
+
+      <div class="table-wrap"><table>
+        <thead><tr><th>File</th><th>Channel</th><th>Approx. size</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>blupi.png</code></td><td>Blupi (2)</td><td>~853 KB</td><td>Main player character — sprites for all 88 BlupiAction states</td></tr>
+          <tr><td><code>blupi1.png</code></td><td>Blupi1_11 (11)</td><td>~814 KB</td><td>Alternate player character variant 1</td></tr>
+          <tr><td><code>object.png</code></td><td>Object (1)</td><td>varies</td><td>Moving foreground objects (enemies, crates, vehicles, projectiles)</td></tr>
+          <tr><td><code>element.png</code></td><td>Element (10)</td><td>~536 KB</td><td>Collectibles (treasure, eggs, keys), particle effects</td></tr>
+          <tr><td><code>explo.png</code></td><td>Explosion (9)</td><td>~910 KB</td><td>Explosions and visual effect animations</td></tr>
+          <tr><td><code>button.png</code></td><td>Button (4)</td><td>~127 KB</td><td>On-screen UI buttons (40×40 px cells)</td></tr>
+          <tr><td><code>jauge.png</code></td><td>Jauge (5)</td><td>small</td><td>HUD gauge bar (124×22 px)</td></tr>
+          <tr><td><code>text.png</code></td><td>Text (6)</td><td>small</td><td>Bitmap font (32×32 px cells, ASCII-mapped)</td></tr>
+        </tbody>
+      </table></div>
+
+      <!-- SOUNDS -->
+      <h2 id="sounds">Content/sounds/ — Sound Effects</h2>
+      <p>92 WAV files: <code>sound000.wav</code> through <code>sound091.wav</code>. Individual file sizes range from ~3 KB to ~15 KB.</p>
+      <p><code>SoundChannel::SoundN</code> maps to file <code>sound(N-1).wav</code> (1-based enum, 0-based filenames).</p>
+
+      <p>For the complete sound-to-filename mapping, see <a href="api-enums.html#soundchannel">API Reference: SoundChannel</a>.</p>
+
+      <h3>Sound Categories Summary</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Files</th><th>Category</th></tr></thead>
+        <tbody>
+          <tr><td>sound000–003</td><td>Jump variants (low/medium/high, stone landing)</td></tr>
+          <tr><td>sound004–008</td><td>Turn, vertigo, look-down, fall, respawn</td></tr>
+          <tr><td>sound009–013</td><td>Explosion, treasure, egg, level lost, level won</td></tr>
+          <tr><td>sound014–017</td><td>Helicopter sounds (start/high/stop/low)</td></tr>
+          <tr><td>sound022–025</td><td>Water splashes, bubble, drown</td></tr>
+          <tr><td>sound027–030</td><td>Jeep engine sounds</td></tr>
+          <tr><td>sound054–058</td><td>Cloud, drink, charge, electro</td></tr>
+          <tr><td>sound067–070</td><td>Hovercraft, lightning, squish, teleport</td></tr>
+          <tr><td>sound071–076</td><td>Bridge, angel, saw, switches</td></tr>
+          <tr><td>sound077–090</td><td>Surface footstep pairs (7 surface types × 2 feet)</td></tr>
+          <tr><td>sound091</td><td>Homing bomb beep</td></tr>
+        </tbody>
+      </table></div>
+
+      <!-- WORLDS -->
+      <h2 id="worlds">worlds/ — Level Files</h2>
+      <p>78 text files: <code>world001.txt</code> through <code>world199.txt</code> (with gaps in numbering). See <a href="formats.html#worldnums">Data Formats: Level Numbering</a> for the full scheme.</p>
+
+      <div class="table-wrap"><table>
+        <thead><tr><th>Count</th><th>Range</th><th>Content</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td>world001</td><td>Tutorial</td></tr>
+          <tr><td>10 each</td><td>world010–world099</td><td>Chapters 1–9</td></tr>
+          <tr><td>varies</td><td>world100–world199</td><td>Extended chapters</td></tr>
+          <tr><td>1</td><td>world199</td><td>Final bonus level</td></tr>
+        </tbody>
+      </table></div>
+
+      <p>For the text file format details, see <a href="formats.html#worldfile">Data Formats: World File Format</a>.</p>
+
+      <!-- HIGH DPI -->
+      <h2 id="highdpi">High-DPI Assets (4×)</h2>
+      <p>Two additional directories contain 4× upscaled versions of the core assets, used when <code>Zoom::ScaleResolution4</code> is active:</p>
+
+      <div class="table-wrap"><table>
+        <thead><tr><th>Directory</th><th>Files</th><th>Resolution scale</th></tr></thead>
+        <tbody>
+          <tr><td><code>Content/backgrounds4x/</code></td><td>35 PNG files</td><td>4× (2560×1920 viewport)</td></tr>
+          <tr><td><code>Content/icons4x/</code></td><td>8 PNG files</td><td>4× sprite sheets</td></tr>
+        </tbody>
+      </table></div>
+
+      <p>Asset selection between normal and 4× is handled automatically by <code>Config::ScaleAsset(path)</code>.</p>
+
+      <div class="callout info">
+        <strong>Note on Missing 4× Backgrounds</strong>
+        Only 35 of the 37 background files have a 4× counterpart. Two backgrounds lack upscaled versions;
+        the exact files are skipped in <code>backgrounds4x/</code>.
+      </div>
+
+      <!-- MANIFEST -->
+      <h2 id="manifest">Content Manifest</h2>
+      <p><code>Content/Content.mgcb</code> is a MonoGame Content Builder manifest file. It was used when the project ran on MonoGame and is kept for historical reference / metadata. It is not processed during the C++ CMake build.</p>
+
+    </main>
+    <footer>
+      Mobile Eggbert is based on <em>Speedy Blupi</em> by Epsitec SA &amp; Daniel Roux.
+      C++ port by the OpenEggbert project. MIT License.
+    </footer>
+  </div>
+</div>
+
+</body>
+</html>

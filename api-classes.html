@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>API: Classes — Mobile Eggbert</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="topnav">
+  <a class="brand" href="index.html">🐣 Mobile Eggbert</a>
+  <nav>
+    <a href="index.html">Overview</a>
+    <a href="history.html">History</a>
+    <a href="build.html">Build</a>
+    <a href="architecture.html">Architecture</a>
+    <a href="gameplay.html">Gameplay</a>
+    <a href="api-enums.html" class="active">API Reference</a>
+    <a href="assets.html">Assets</a>
+    <a href="formats.html">Formats</a>
+    <a href="cheats.html">Cheats</a>
+    <a href="performance.html">Performance</a>
+  </nav>
+</div>
+
+<div class="layout">
+  <aside class="sidebar">
+    <h4>Classes</h4>
+    <a href="#decor">Decor</a>
+    <a href="#game1">Game1</a>
+    <a href="#pixmap">Pixmap / IPixmap</a>
+    <a href="#sound">Sound / ISound</a>
+    <a href="#inputpad">InputPad</a>
+    <a href="#gamedata">GameData</a>
+    <a href="#worlds">Worlds</a>
+    <a href="#tables">Tables</a>
+    <a href="#text">Text</a>
+    <a href="#tinypoint">TinyPoint</a>
+    <a href="#tinyrect">TinyRect</a>
+
+    <h4>Also See</h4>
+    <a href="api-enums.html">Enumerations</a>
+    <a href="formats.html">Data Formats</a>
+  </aside>
+
+  <div style="flex:1; min-width:0;">
+    <main>
+      <h1>API Reference: Key Classes</h1>
+      <p>Detailed documentation of the most important C++ classes in Mobile Eggbert. For enum types, see <a href="api-enums.html">Enumerations</a>.</p>
+
+      <!-- DECOR -->
+      <h2 id="decor">Decor</h2>
+      <p><strong>File:</strong> <code>include/WindowsPhoneSpeedyBlupi/Decor.hpp</code>, <code>src/WindowsPhoneSpeedyBlupi/Decor.cpp</code> (~9400+ lines)</p>
+      <p>The core of the entire game simulation. Owns the world grid, all moving objects, the player character, physics, collision, AI, camera, rendering, and win/loss detection.</p>
+
+      <h3>Player State Fields</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Field</th><th>Type</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>m_blupiX</code>, <code>m_blupiY</code></td><td>int</td><td>Player position in game-space pixels</td></tr>
+          <tr><td><code>m_blupiAction</code></td><td>BlupiAction</td><td>Current animation state</td></tr>
+          <tr><td><code>m_blupiDir</code></td><td>Direction</td><td>Facing direction</td></tr>
+          <tr><td><code>m_blupiPhase</code></td><td>int</td><td>Animation frame index into Tables</td></tr>
+          <tr><td><code>m_blupiChannel</code></td><td>PixmapChannel</td><td>Which sprite sheet variant is in use</td></tr>
+          <tr><td><code>m_blupiHelico</code></td><td>bool</td><td>Currently in helicopter</td></tr>
+          <tr><td><code>m_blupiJeep</code></td><td>bool</td><td>Currently in jeep</td></tr>
+          <tr><td><code>m_blupiTank</code></td><td>bool</td><td>Currently in tank</td></tr>
+          <tr><td><code>m_blupiSkate</code></td><td>bool</td><td>Currently on skateboard</td></tr>
+          <tr><td><code>m_blupiSurf</code></td><td>bool</td><td>At water surface</td></tr>
+          <tr><td><code>m_blupiNage</code></td><td>bool</td><td>Swimming in deep water</td></tr>
+          <tr><td><code>m_blupiOver</code></td><td>bool</td><td>Currently in hovercraft</td></tr>
+          <tr><td><code>m_blupiInvert</code></td><td>bool</td><td>Controls are inverted</td></tr>
+          <tr><td><code>m_blupiCloud</code></td><td>bool</td><td>Cloud invisibility active</td></tr>
+          <tr><td><code>m_blupiShield</code></td><td>int</td><td>Shield timer (100 ticks when active)</td></tr>
+          <tr><td><code>m_blupiPhantom</code></td><td>int</td><td>Invisibility timer</td></tr>
+          <tr><td><code>m_blupiCle</code></td><td>DoorKeyFlags</td><td>Keys currently held</td></tr>
+          <tr><td><code>m_blupiBullet</code></td><td>int</td><td>Tank ammo count</td></tr>
+          <tr><td><code>m_blupiDynamite</code></td><td>int</td><td>Dynamite count</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>Key Methods</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Method</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>InitDecor()</code></td><td>Initializes / resets the world grid</td></tr>
+          <tr><td><code>InitGamer()</code></td><td>Initializes player state for a new game</td></tr>
+          <tr><td><code>MoveStep()</code></td><td>Per-frame update: player physics, object AI, collision</td></tr>
+          <tr><td><code>Build()</code></td><td>Renders the world tiles and all objects</td></tr>
+          <tr><td><code>DrawInfo()</code></td><td>Renders the HUD (lives, keys, power-up indicators)</td></tr>
+          <tr><td><code>IsLave(x, y)</code></td><td>Returns true if tile at (x,y) is lava</td></tr>
+          <tr><td><code>IsDeepWater(x, y)</code></td><td>Returns true if tile is deep water</td></tr>
+          <tr><td><code>IsDoor(x, y)</code></td><td>Returns true if tile is a locked door</td></tr>
+          <tr><td><code>IsBridge(x, y)</code></td><td>Returns true if tile is a fragile bridge</td></tr>
+        </tbody>
+      </table></div>
+
+      <h3>World Grid</h3>
+      <pre><code>struct Cellule { short icon; };
+
+Cellule m_decor[100][100];     // base tile layer
+Cellule m_bigDecor[100][100];  // secondary decorative layer</code></pre>
+
+      <hr>
+
+      <!-- GAME1 -->
+      <h2 id="game1">Game1</h2>
+      <p><strong>File:</strong> <code>include/WindowsPhoneSpeedyBlupi/Game1.hpp</code>, <code>src/WindowsPhoneSpeedyBlupi/Game1.cpp</code></p>
+      <p>The top-level XNA game class. Inherits CNA's <code>Game</code> base. Owns all subsystems, drives the phase state machine, handles button callbacks (<code>WM_BUTTON*</code>), and the cheat system.</p>
+
+      <h3>Lifecycle</h3>
+      <pre><code>Initialize()   → platform/window setup
+LoadContent()  → sprite sheets, sounds, level data
+Update()       → input, phase state machine, game logic
+Draw()         → SpriteBatch rendering pass</code></pre>
+
+      <h3>Phase Transitions</h3>
+      <p><code>Game1::SetPhase(Phase p)</code> centralizes all side-effects of phase changes: asset loading, InputPad reconfiguration, fade animations. Never set the phase field directly — always call <code>SetPhase()</code>.</p>
+
+      <h3>Button Dispatching</h3>
+      <p>UI button presses arrive as named <code>ButtonGlyph</code> enum values to <code>Game1::HandleButton(ButtonGlyph)</code>, which dispatches to the appropriate handler based on the current phase.</p>
+
+      <hr>
+
+      <!-- PIXMAP -->
+      <h2 id="pixmap">Pixmap / IPixmap</h2>
+      <p><strong>File:</strong> <code>include/WindowsPhoneSpeedyBlupi/Pixmap.hpp</code>, <code>IPixmap.hpp</code></p>
+      <p><code>IPixmap</code> is the interface. <code>Pixmap</code> is the concrete implementation using CNA's <code>SpriteBatch</code>.</p>
+
+      <h3>Channel Management</h3>
+      <p>17 named channels (1–17) each correspond to a loaded texture. Key operations:</p>
+      <ul>
+        <li><code>LoadChannel(PixmapChannel, path)</code> — load a PNG into a channel</li>
+        <li><code>DrawIcon(channel, icon, x, y, …)</code> — draw a sprite cell</li>
+        <li><code>SetScrollOffset(x, y)</code> — set camera scroll position</li>
+      </ul>
+
+      <hr>
+
+      <!-- SOUND -->
+      <h2 id="sound">Sound / ISound</h2>
+      <p><strong>File:</strong> <code>include/WindowsPhoneSpeedyBlupi/Sound.hpp</code>, <code>ISound.hpp</code></p>
+      <p>Manages 93 WAV slots via CNA's audio layer (SDL3_mixer). Volume and stereo balance are controlled via per-channel tables in <code>Sound.cpp</code>.</p>
+
+      <h3>Key Operations</h3>
+      <ul>
+        <li><code>PlaySound(SoundChannel, x)</code> — play a sound with automatic panning based on screen X position</li>
+        <li><code>StopAll()</code> — stop all audio (called on phase transitions)</li>
+        <li><code>SetMasterVolume(float)</code> — global volume control</li>
+      </ul>
+
+      <hr>
+
+      <!-- INPUTPAD -->
+      <h2 id="inputpad">InputPad</h2>
+      <p><strong>File:</strong> <code>include/WindowsPhoneSpeedyBlupi/InputPad.hpp</code>, <code>src/WindowsPhoneSpeedyBlupi/InputPad.cpp</code></p>
+      <p>Abstracts touch, keyboard, and accelerometer input into the two values Decor needs: a <code>Direction</code> and a <code>KeyPressFlags</code> bitmask.</p>
+
+      <h3>Input Sources</h3>
+      <ul>
+        <li><strong>Touch:</strong> on-screen buttons (PlayJump, PlayAction, PlayDown, D-pad)</li>
+        <li><strong>Keyboard:</strong> arrow keys → Direction, Z/X/C or Space → Jump/Fire/Down</li>
+        <li><strong>Accelerometer:</strong> tilt → Direction (optional, toggle in settings)</li>
+      </ul>
+
+      <p>InputPad is reconfigured on each phase transition (e.g., touch buttons are hidden during menus, shown during Play).</p>
+
+      <hr>
+
+      <!-- GAMEDATA -->
+      <h2 id="gamedata">GameData</h2>
+      <p><strong>File:</strong> <code>include/WindowsPhoneSpeedyBlupi/GameData.hpp</code>, <code>src/WindowsPhoneSpeedyBlupi/GameData.cpp</code></p>
+      <p>Manages a flat 640-byte binary array persisted to disk (or IndexedDB on web). Three gamer slots of 210 bytes each, plus a 10-byte header.</p>
+
+      <h3>Key Accessors</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Accessor</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>getSelectedGamerProperty()</code></td><td>Currently active gamer slot (0–2)</td></tr>
+          <tr><td><code>setSelectedGamerProperty(int)</code></td><td>Switch active gamer slot</td></tr>
+          <tr><td><code>getNbViesProperty()</code></td><td>Lives remaining for active gamer</td></tr>
+          <tr><td><code>setNbViesProperty(int)</code></td><td>Set lives remaining</td></tr>
+          <tr><td><code>getLastWorldProperty()</code></td><td>Last level reached by active gamer</td></tr>
+          <tr><td><code>setLastWorldProperty(int)</code></td><td>Set last level reached</td></tr>
+        </tbody>
+      </table></div>
+
+      <p>Serialized/deserialized via <code>Worlds::ReadGameData()</code> / <code>Worlds::WriteGameData()</code>. See <a href="formats.html#savedata">Data Formats: Save Data</a> for the full layout.</p>
+
+      <hr>
+
+      <!-- WORLDS -->
+      <h2 id="worlds">Worlds</h2>
+      <p><strong>File:</strong> <code>include/WindowsPhoneSpeedyBlupi/Worlds.hpp</code>, <code>src/WindowsPhoneSpeedyBlupi/Worlds.cpp</code></p>
+      <p>Handles all file I/O for level data and save data.</p>
+
+      <h3>Key Operations</h3>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Method</th><th>Description</th></tr></thead>
+        <tbody>
+          <tr><td><code>ReadWorld(int worldNum, Decor&amp;)</code></td><td>Load a level from <code>worlds/worldNNN.txt</code></td></tr>
+          <tr><td><code>WriteWorld(int worldNum, Decor&amp;)</code></td><td>Save level state back to file</td></tr>
+          <tr><td><code>ReadGameData(GameData&amp;)</code></td><td>Load save data from persistent storage</td></tr>
+          <tr><td><code>WriteGameData(GameData&amp;)</code></td><td>Write save data to persistent storage</td></tr>
+        </tbody>
+      </table></div>
+
+      <hr>
+
+      <!-- TABLES -->
+      <h2 id="tables">Tables</h2>
+      <p><strong>File:</strong> <code>include/WindowsPhoneSpeedyBlupi/Tables.hpp</code>, <code>src/WindowsPhoneSpeedyBlupi/Tables.cpp</code></p>
+      <p>Two static data structures:</p>
+      <ol>
+        <li><strong>Animation table</strong> — 2911 entries mapping <code>(BlupiAction, phase)</code> → <code>(channel, icon, nextPhase)</code>. Drives all character animation without per-action branching in Decor.</li>
+        <li><strong>Cheat code list</strong> — 22 string entries used by <code>Game1::CheatAction()</code>.</li>
+      </ol>
+      <pre><code>struct TableEntry {
+    PixmapChannel channel;
+    short         icon;
+    short         nextPhase;
+};
+
+extern const TableEntry AnimTable[2911];
+extern const char* CheatCodes[22];</code></pre>
+
+      <hr>
+
+      <!-- TEXT -->
+      <h2 id="text">Text</h2>
+      <p><strong>File:</strong> <code>include/WindowsPhoneSpeedyBlupi/Text.hpp</code>, <code>src/WindowsPhoneSpeedyBlupi/Text.cpp</code></p>
+      <p>Bitmap font renderer using <code>icons/text.png</code> (32×32 px cells, <code>PixmapChannel::Text</code>). Used to render level names, score displays, and HUD text.</p>
+
+      <hr>
+
+      <!-- TINYPOINT -->
+      <h2 id="tinypoint">TinyPoint</h2>
+      <p><strong>File:</strong> <code>include/WindowsPhoneSpeedyBlupi/TinyPoint.hpp</code></p>
+      <p>Simple 2D integer point. Standard <code>(x, y)</code> field order.</p>
+      <pre><code>struct TinyPoint {
+    int x;
+    int y;
+};</code></pre>
+
+      <hr>
+
+      <!-- TINYRECT -->
+      <h2 id="tinyrect">TinyRect</h2>
+      <p><strong>File:</strong> <code>include/WindowsPhoneSpeedyBlupi/TinyRect.hpp</code></p>
+
+      <div class="callout danger">
+        <strong>Non-Standard Field Order!</strong>
+        <code>TinyRect</code> fields are <strong>Left, Right, Top, Bottom</strong> — not <strong>Left, Top, Right, Bottom</strong>
+        as in most frameworks. The constructor is <code>TinyRect(left, right, top, bottom)</code>.
+        Passing arguments in the wrong order produces silent geometry bugs that are very hard to diagnose.
+      </div>
+
+      <pre><code>struct TinyRect {
+    int Left;
+    int Right;   // ← NOT Top
+    int Top;     // ← NOT Right
+    int Bottom;
+
+    TinyRect(int left, int right, int top, int bottom);
+};</code></pre>
+
+    </main>
+    <footer>
+      Mobile Eggbert is based on <em>Speedy Blupi</em> by Epsitec SA &amp; Daniel Roux.
+      C++ port by the OpenEggbert project. MIT License.
+    </footer>
+  </div>
+</div>
+
+</body>
+</html>
